@@ -11,6 +11,8 @@ class Webcam extends Component {
     fps: 0,
     blurMode: true,
     wasmMode: false,
+    info: null,
+    infoTimeout: null,
   }
 
   async componentDidMount() {
@@ -28,6 +30,7 @@ class Webcam extends Component {
     if (this.video.srcObject) {
       this.video.srcObject.getTracks()[0].stop();
     }
+    window.clearTimeout(this.state.infoTimeout);
     window.cancelAnimationFrame(this.updateCanvas);
   }
 
