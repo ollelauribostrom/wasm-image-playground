@@ -115,7 +115,7 @@ class ShapeDetector extends Component {
           src={image.data}
           alt="uploaded"
           className={`uploaded-image ${image.hasSquare ? 'has-square' : ''}`}
-          key={image.name}
+          key={image.id}
         />
       )
     })

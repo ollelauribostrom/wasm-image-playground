@@ -1,4 +1,5 @@
 import { isFunction } from './general';
+import shortid from 'shortid';
 
 export function resizeImage(img, maxWidth, maxHeight) {
   if (img.width > maxWidth) {
@@ -17,9 +18,10 @@ export function resizeImage(img, maxWidth, maxHeight) {
 }
 
 export function isImage(file) {
+  console.log(file);
   return file.type === 'image/png' || 
     file.type === 'image/jpg' ||
-    file.type === 'image/svg' ||
+    file.type === 'image/svg+xml' ||
     file.type === 'image/gif';
 }
 
@@ -42,7 +44,7 @@ export async function asyncImageLoader(file, skip) {
       }
     }
     const reader = new FileReader();
-    reader.onload = () => resolve({ data: reader.result, name: file.name });
+    reader.onload = () => resolve({ data: reader.result, id: shortid.generate() });
     reader.readAsDataURL(file);
   });
 }
