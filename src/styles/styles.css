@@ -411,3 +411,54 @@ a {
 .has-square {
   border: 4px solid #4CCC7F;
 }
+
+@media only screen 
+and (max-device-width : 1024px)  {
+  .app-header-title {
+    font-size: 30px;
+    width: 100%;
+  }
+  .Home-wrapper {
+    padding: 100px;
+  }
+  .icon-xxl {
+    width: 80px;
+  }
+  .label-small {
+    align-self: flex-end;
+    margin-top: 20px;
+  }
+  .app-header-top {
+    flex-wrap: wrap;
+  }
+}
+
+@media only screen 
+and (max-device-width : 767px) {
+  .icon-xxl {
+    width: 60px;
+  }
+  .label-small {
+    width: 45%;
+    padding: 10px 0;
+    font-size: 10px;
+  }
+  .component-content {
+    flex-direction: column;
+  }
+  .component-content.image-container {
+    flex-direction: row;
+  }
+  .info-label {
+    right: 0px;
+  }
+  .info-label-hidden {
+    right: -999px;
+  }
+  .toolbar-button {
+    margin-top: 20px;
+  }
+  .app-header-top {
+    justify-content: space-between;
+  }
+}
