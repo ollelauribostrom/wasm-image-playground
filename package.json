@@ -13,6 +13,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "now-clean": "now rm wasm-image-playground -y",
+    "now-setup": "cp now.json ./build/now.json && cd ./build",
+    "now": "npm run now-clean && npm run build && npm run now-setup && now && now alias"
   }
 }

@@ -1,0 +1,6 @@
+{
+  "name": "wasm-image-playground",
+  "alias": "wasm-image-playground.now.sh",
+  "public": true,
+  "type": "static"
+}
