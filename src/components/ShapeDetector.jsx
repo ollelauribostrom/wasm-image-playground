@@ -5,6 +5,7 @@ import Label from './Label';
 import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
+import { isImage, asyncImageListLoader } from '../utils/image';
 
 class ShapeDetector extends Component {
   state = {
@@ -44,23 +45,12 @@ class ShapeDetector extends Component {
     this.loadImages(ev.dataTransfer.files);
   }
 
-  loadImages = files => {
-    for (let i = 0; i < files.length; i++) {
-      if (files[i].type === 'image/png' || files[i].type === 'image/jpg') {
-        this.loadImage(files[i], i < files.length - 1);
-      } else {
-        this.displayInfoLabel('File is not an image (png/jpg), skipping')
-      }
-    }
-  }
-
-  loadImage = (imgData, loading) => {
-    const reader = new FileReader();
-    reader.onload = () => this.setState({
-      images: [...this.state.images, { data: reader.result, name: imgData.name }],
-      loading
-    });
-    reader.readAsDataURL(imgData);
+  loadImages = async fileList => {
+    const newImages = await asyncImageListLoader(fileList, () => {
+      this.displayInfoLabel('File is not an image, skipping')
+    })
+    const images = [...this.state.images, ...newImages];
+    this.setState({ images, loading: false })
   }
 
   toggleWasmMode = () => {
