@@ -6,6 +6,9 @@ import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import { resizeImage } from '../utils/image';
+import Worker from '../services/imageEditor.worker';
+
+const worker = new Worker();
 
 class ImageEditor extends Component {
   state = {
@@ -98,6 +101,9 @@ class ImageEditor extends Component {
       return;
     }
     // Blur image here
+    worker.postMessage({
+      action: this.state.wasmMode ? 'blurWasm' : 'blurJs'
+    })
     this.displayInfoLabel('Image blur not implemented yet');
   }
 
@@ -106,6 +112,9 @@ class ImageEditor extends Component {
       return;
     }
     // Convert to BW here
+    worker.postMessage({
+      action: this.state.wasmMode ? 'bwWasm' : 'bwJs'
+    })
     this.displayInfoLabel('Image to BW not implemented yet');
   }
 

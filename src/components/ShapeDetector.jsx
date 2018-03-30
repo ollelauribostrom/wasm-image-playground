@@ -6,6 +6,9 @@ import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import { isImage, asyncImageListLoader } from '../utils/image';
+import Worker from '../services/shapeDetector.worker';
+
+const worker = new Worker();
 
 class ShapeDetector extends Component {
   state = {
@@ -85,6 +88,9 @@ class ShapeDetector extends Component {
     }
     if (this.state.images.length) {
       // Run square detection here
+      worker.postMessage({
+        action: this.state.wasmMode? 'detectSquaresWasm' : 'detectSquaresJs'
+      })
       this.displayInfoLabel('Square detection not implemented yet (running fake)');
       this.fakeSquareDetection();
     } else {

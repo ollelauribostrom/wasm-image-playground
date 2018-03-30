@@ -5,6 +5,9 @@ import Label from './Label';
 import WasmMode from './WasmMode';
 import InfoLabel from './InfoLabel';
 import glasses from '../assets/glasses.svg';
+import Worker from '../services/webcam.worker';
+
+const worker = new Worker();
 
 class Webcam extends Component {
   state = {
@@ -84,6 +87,9 @@ class Webcam extends Component {
   runBlur = (area) => {
     this.ctx.filter = 'blur(10px)';
     // Perform face detection here to know where to place blur
+    worker.postMessage({
+      action: this.state.wasmMode ? 'faceDetectionWasm' : 'faceDetectionJs'
+    })
     this.ctx.drawImage(this.video, 100, 100, 100, 100, 100, 100, 100, 100);
   }
 
@@ -91,6 +97,9 @@ class Webcam extends Component {
     const img = new Image();
     img.src = glasses
     // Perform eye tracking here to know where to place glasses
+    worker.postMessage({
+      action: this.state.wasmMode ? 'eyeDetectionWasm' : 'eyeDetectionJs'
+    })
     this.ctx.drawImage(img, 100, 100)
   }
 
