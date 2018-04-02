@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import shortid from 'shortid';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
 import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
-import { resizeImage } from '../utils/image';
+import { resizeImage, isImage } from '../utils/image';
 import Worker from '../services/imageEditor.worker';
 
 const worker = new Worker();
@@ -16,12 +17,14 @@ class ImageEditor extends Component {
     loading: false,
     dragging: false,
     draggingTimeout: null,
-    info: null,
+    info: [],
     infoTimeout: null,
     image: null
   }
 
   componentDidMount() {
+    worker.postMessage({ action: 'status' });
+    worker.addEventListener('message', this.onMessage);
     window.addEventListener('dragover', this.onDragOver);
     window.addEventListener('drop', this.onDrop);
     window.addEventListener('resize', this.onResize);
@@ -32,9 +35,24 @@ class ImageEditor extends Component {
   componentWillUnmount() {
     window.clearTimeout(this.state.draggingTimeout);
     window.clearTimeout(this.state.infoTimeout);
+    worker.removeEventListener('message', this.onMessage);
     window.removeEventListener('dragover', this.onDragOver);
     window.removeEventListener('drop', this.onDrop);
     window.removeEventListener('resize', this.onResize);
+  }
+
+  onMessage = ({ data }) => {
+    if (data.img) {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+      this.ctx.putImageData(data.img, 0, 0);
+    }
+    if (data.editorLoaded === false) {
+      this.setState({ info: 'Loading editor...', editorLoaded: false });
+      worker.postMessage({ action: 'init' });
+      return;
+    }
+    this.displayInfoLabel(data.info);
+    this.setState({ loading: false, editorLoaded: true });
   }
 
   onDragOver = ev => {
@@ -48,9 +66,13 @@ class ImageEditor extends Component {
 
   onDrop = ev => {
     ev.preventDefault();
-    const originalImage = ev.dataTransfer.files[0];
-    this.setState({ originalImage, loading: true });
-    this.drawImage(originalImage);
+    const file = ev.dataTransfer.files[0];
+    if (isImage(file)) {
+      this.setState({ originalImage: file, loading: true });
+      this.drawImage(file);
+    } else {
+      this.displayInfoLabel('The dropped file is not an image');
+    }
   }
 
   onResize = ev => {
@@ -63,7 +85,7 @@ class ImageEditor extends Component {
     });
   }
 
-  displayInfoLabel = info => {
+  displayInfoLabel = (info, duration = 5000) => {
     const infoTimeout = window.setTimeout(this.dismissInfoLabel, 5000);
     window.clearTimeout(this.state.infoTimeout);
     this.setState({ info, infoTimeout });
@@ -83,6 +105,7 @@ class ImageEditor extends Component {
 
   runReset = () => {
     if (this.state.originalImage) {
+      this.setState({ loading: true });
       this.displayInfoLabel('Image restored');
       this.drawImage(this.state.originalImage);
     }
@@ -97,25 +120,29 @@ class ImageEditor extends Component {
   }
 
   runBlur = () => {
-    if (this.state.loading) {
+    if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
       return;
     }
     // Blur image here
+    this.setState({ loading: true });
+    const img = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     worker.postMessage({
-      action: this.state.wasmMode ? 'blurWasm' : 'blurJs'
-    })
-    this.displayInfoLabel('Image blur not implemented yet');
+      action: this.state.wasmMode ? 'blurWasm' : 'blurJs',
+      img
+    });
   }
 
   runBW = () => {
-    if (this.state.loading) {
+    if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
       return;
     }
     // Convert to BW here
+    this.setState({ loading: true });
+    const img = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     worker.postMessage({
-      action: this.state.wasmMode ? 'bwWasm' : 'bwJs'
-    })
-    this.displayInfoLabel('Image to BW not implemented yet');
+      action: this.state.wasmMode ? 'bwWasm' : 'bwJs',
+      img
+    });
   }
 
   drawImage = (imgData, onResize = false) => {
@@ -151,7 +178,7 @@ class ImageEditor extends Component {
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
-            <Spinner visible={this.state.loading} color="#A599FF" />
+            <Spinner visible={this.state.loading || this.state.editorLoaded === false } color="#A599FF" />
             <Label
               icon={<Icon name="restore" size="s"/>}
               size="square"
