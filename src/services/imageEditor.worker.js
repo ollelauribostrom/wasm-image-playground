@@ -1,6 +1,6 @@
-import { timed } from '../utils/time';
+import { timed, rounded } from '../utils/time';
 import makeCv from '../../lib/opencv_js';
-// import tracking from '../../lib/tracking-min';
+import { gaussianBlur, grayscale } from 'imutils'; 
 
 let cv;
 
@@ -20,22 +20,22 @@ function init(data) {
         .then((instance) => {
           cv = instance;
           console.log('Finished loading OpenCv & Tracking.js');
-          self.postMessage({ info: 'Editor loaded', editorLoaded: true });
+          postMessage({ info: 'Editor loaded', editorLoaded: true });
       })
     } catch (err) {
       console.error('Finished loading OpenCv & Tracking.js');
-      self.postMessage({ info: 'Error loading editor', editorLoaded: true });
+      postMessage({ info: 'Error loading editor', editorLoaded: true });
     }
   } else {
-    self.postMessage({ editorLoaded: true, clearInfo: true })
+    postMessage({ editorLoaded: true, clearInfo: true })
   }
 }
 
 function status(data) {
   if (cv) {
-    self.postMessage({ editorLoaded: true });
+    postMessage({ editorLoaded: true });
   } else {
-    self.postMessage({ editorLoaded: false });
+    postMessage({ editorLoaded: false });
   }
 }
 
@@ -57,7 +57,7 @@ function blurWasm(data) {
       return { err: 'Something went wrong when using WebAssembly to blur image' }
     }
   });
-  self.postMessage({
+  postMessage({
     img: result,
     info: err || `Blurred using WebAssembly in ${Math.round(time)}ms`,
     time
@@ -66,12 +66,12 @@ function blurWasm(data) {
 
 function blurJs(data) {
   const { result, time, err } = timed(() => {
-    // Perform blur using js here
-    return data.img;
+    const blurred = gaussianBlur(data.img.data, data.img.width, data.img.height, 9);
+    return new ImageData(Uint8ClampedArray.from(blurred), data.img.width, data.img.height);
   });
-  self.postMessage({
+  postMessage({
     img: result,
-    info: err || `Blurred using JS in ${time}ms`,
+    info: err || `Blurred using JS in ${Math.round(time)}ms`,
     time
   });
 }
@@ -85,29 +85,32 @@ function bwWasm(data) {
     }
     try {
       const image = cv.matFromImageData(data.img);
-      const destination = new cv.Mat(image.rows, image.cols, image.type());
-      cv.cvtColor(image, destination, cv.COLOR_RGBA2GRAY, 4);
-      return new ImageData(Uint8ClampedArray.from(destination.data), image.cols, image.rows);
+      console.log(4 * image.cols * image.rows);
+      const temp = new cv.Mat(image.rows, image.cols, image.type());
+      const dest = new cv.Mat();
+      cv.cvtColor(image, temp, cv.COLOR_RGBA2GRAY, 4);
+      temp.convertTo(dest, 4);
+      return new ImageData(Uint8ClampedArray.from(dest.data), data.img.width, data.img.height);
     } catch (err) {
       console.error(err);
       return { err: 'Something went wrong when using WebAssembly to transform image to BW' }
     }
   });
-  self.postMessage({
+  postMessage({
     img: result,
-    info: err || `Transformed to BW using WebAssembly in ${time}ms`,
+    info: err || `Transformed to BW using WebAssembly in ${Math.round(time)}ms`,
     time
   });
 }
 
 function bwJs(data) {
   const { result, time, err } = timed(() => {
-    // Perform bw using js here
-    return data.img;
+    const bw = grayscale(data.img.data, data.img.width, data.img.height, true);
+    return new ImageData(bw, data.img.width, data.img.height);
   });
-  self.postMessage({
+  postMessage({
     img: result,
-    info: err || `Transformed to BW using JS in ${time}ms`,
+    info: err || `Transformed to BW using JS in ${Math.round(time)}ms`,
     time
   });
 }

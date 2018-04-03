@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import shortid from 'shortid';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
 import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
-import { resizeImage, isImage } from '../utils/image';
+import { resizeImage } from '../utils/image';
 import Worker from '../services/imageEditor.worker';
+import { isImage } from 'imutils'; 
 
 const worker = new Worker();
 
@@ -43,6 +43,7 @@ class ImageEditor extends Component {
 
   onMessage = ({ data }) => {
     if (data.img) {
+      console.log(data.img)
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.putImageData(data.img, 0, 0);
     }
