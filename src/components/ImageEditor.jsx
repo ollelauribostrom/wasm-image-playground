@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { isImage } from 'imutils';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
@@ -6,8 +7,7 @@ import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import { resizeImage } from '../utils/image';
-import Worker from '../services/imageEditor.worker';
-import { isImage } from 'imutils'; 
+import Worker from '../services/imageEditor.worker'; 
 
 const worker = new Worker();
 
@@ -43,7 +43,6 @@ class ImageEditor extends Component {
 
   onMessage = ({ data }) => {
     if (data.img) {
-      console.log(data.img)
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.ctx.putImageData(data.img, 0, 0);
     }
@@ -124,7 +123,6 @@ class ImageEditor extends Component {
     if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
       return;
     }
-    // Blur image here
     this.setState({ loading: true });
     const img = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     worker.postMessage({
@@ -137,7 +135,6 @@ class ImageEditor extends Component {
     if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
       return;
     }
-    // Convert to BW here
     this.setState({ loading: true });
     const img = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     worker.postMessage({

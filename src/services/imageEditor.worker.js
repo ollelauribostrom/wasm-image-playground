@@ -14,24 +14,24 @@ onmessage = async ({ data }) => {
 
 function init(data) {
   if (!cv) {
-    console.log('Loading OpenCv & Tracking.js..');
+    console.log('Loading OpenCv..');
     try {
       makeCv()
         .then((instance) => {
           cv = instance;
-          console.log('Finished loading OpenCv & Tracking.js');
+          console.log('Finished loading OpenCv');
           postMessage({ info: 'Editor loaded', editorLoaded: true });
       })
-    } catch (err) {
-      console.error('Finished loading OpenCv & Tracking.js');
-      postMessage({ info: 'Error loading editor', editorLoaded: true });
+    } catch (error) {
+      console.error('Finished loading OpenCv');
+      postMessage({ info: 'erroror loading editor', editorLoaded: true });
     }
   } else {
     postMessage({ editorLoaded: true, clearInfo: true })
   }
 }
 
-function status(data) {
+function status() {
   if (cv) {
     postMessage({ editorLoaded: true });
   } else {
@@ -39,78 +39,102 @@ function status(data) {
   }
 }
 
-function blurWasm(data) {
-  const { result, time, err } = timed(() => {
+function blurWasm({ img }) {
+  const { result, time, error } = timed(() => {
     if (!cv) {
-      return {
-        err: 'OpenCv is not loaded'
-      }
+      const cvError = new Error('OpenCv is not loaded');
+      error.cvNotLoaded = true;
+      throw cvError;
     }
-    try {
-      const destination = new cv.Mat();
-      const size = new cv.Size(9, 9);
-      const image = cv.matFromImageData(data.img);
-      cv.GaussianBlur(image, destination, size, 0, 0, cv.BORDER_DEFAULT);
-      return new ImageData(Uint8ClampedArray.from(destination.data), data.img.width, data.img.height);
-    } catch (err) {
-      console.error(err);
-      return { err: 'Something went wrong when using WebAssembly to blur image' }
-    }
+    const image = cv.matFromImageData(img);
+    const size = new cv.Size(9, 9);
+    cv.GaussianBlur(image, image, size, 0, 0, cv.BORDER_DEFAULT);
+    return imshowWrapper(image);
+  }, {
+    action: 'blur image',
+    language: 'WebAssembly',    
   });
   postMessage({
     img: result,
-    info: err || `Blurred using WebAssembly in ${Math.round(time)}ms`,
+    info: error || `Blurred using WebAssembly in ${Math.round(time)}ms`,
     time
   });
 }
 
-function blurJs(data) {
-  const { result, time, err } = timed(() => {
-    const blurred = gaussianBlur(data.img.data, data.img.width, data.img.height, 9);
-    return new ImageData(Uint8ClampedArray.from(blurred), data.img.width, data.img.height);
+function blurJs({ img }) {
+  const { result, time, error } = timed(() => {
+    const blurred = gaussianBlur(img.data, img.width, img.height, 9);
+    return new ImageData(Uint8ClampedArray.from(blurred), img.width, img.height);
+  }, {
+    action: 'blur image',
+    language: 'JS',    
   });
   postMessage({
     img: result,
-    info: err || `Blurred using JS in ${Math.round(time)}ms`,
+    info: error || `Blurred using JS in ${Math.round(time)}ms`,
     time
   });
 }
 
-function bwWasm(data) {
-  const { result, time, err } = timed(() => {
+function bwWasm({ img }) {
+  const { result, time, error } = timed(() => {
     if (!cv) {
-      return {
-        err: 'OpenCv is not loaded'
-      }
+      const cvError = new Error('OpenCv is not loaded');
+      error.cvNotLoaded = true;
+      throw cvError;
     }
-    try {
-      const image = cv.matFromImageData(data.img);
-      console.log(4 * image.cols * image.rows);
-      const temp = new cv.Mat(image.rows, image.cols, image.type());
-      const dest = new cv.Mat();
-      cv.cvtColor(image, temp, cv.COLOR_RGBA2GRAY, 4);
-      temp.convertTo(dest, 4);
-      return new ImageData(Uint8ClampedArray.from(dest.data), data.img.width, data.img.height);
-    } catch (err) {
-      console.error(err);
-      return { err: 'Something went wrong when using WebAssembly to transform image to BW' }
-    }
+    const image = cv.matFromImageData(img);
+    cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 4);
+    return imshowWrapper(image);
+  }, {
+    action: 'transform image to BW',
+    language: 'WebAssembly',    
   });
   postMessage({
     img: result,
-    info: err || `Transformed to BW using WebAssembly in ${Math.round(time)}ms`,
+    info: error || `Transformed to BW using WebAssembly in ${Math.round(time)}ms`,
     time
   });
 }
 
-function bwJs(data) {
-  const { result, time, err } = timed(() => {
-    const bw = grayscale(data.img.data, data.img.width, data.img.height, true);
-    return new ImageData(bw, data.img.width, data.img.height);
+function bwJs({ img }) {
+  const { result, time, error } = timed(() => {
+    const bw = grayscale(img.data, img.width, img.height, true);
+    return new ImageData(bw, img.width, img.height);
+  }, { 
+    action: 'transform image to BW',
+    language: 'JS',
   });
   postMessage({
     img: result,
-    info: err || `Transformed to BW using JS in ${Math.round(time)}ms`,
+    info: error || `Transformed to BW using JS in ${Math.round(time)}ms`,
     time
   });
+}
+
+function imshowWrapper(mat) {
+  if(!(mat instanceof cv.Mat)) {
+    throw new Error("Please input the valid cv.Mat instance.");
+  }
+  const img = new cv.Mat();
+  const depth = mat.type() % 8;
+  const scale = depth <= cv.CV_8S ? 1 : depth <= cv.CV_32S ? 1 / 256 : 255;
+  const shift = depth === cv.CV_8S || depth === cv.CV_16S ? 128 : 0;
+  mat.convertTo(img, cv.CV_8U, scale, shift);
+  switch(img.type()) {
+    case cv.CV_8UC1:
+      cv.cvtColor(img, img, cv.COLOR_GRAY2RGBA);
+      break;
+    case cv.CV_8UC3:
+      cv.cvtColor(img, img, cv.COLOR_RGB2RGBA);
+      break;
+    case cv.CV_8UC4:
+      break;
+    default:
+      throw new Error("Bad number of channels (Source image must have 1, 3 or 4 channels)");
+  }
+  const imgData = new ImageData(new Uint8ClampedArray(img.data), img.cols, img.rows);
+  img.delete();
+  mat.delete();
+  return imgData;
 }
