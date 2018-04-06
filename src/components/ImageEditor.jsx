@@ -100,10 +100,10 @@ class ImageEditor extends Component {
       return;
     }
     this.displayInfoLabel(`Now running ${!this.state.wasmMode ? 'WebAssembly' : 'JavaScript' }`)
-    this.setState({wasmMode: !this.state.wasmMode});
+    this.setState({ wasmMode: !this.state.wasmMode });
   }
 
-  runReset = () => {
+  runRestore = () => {
     if (this.state.originalImage) {
       this.setState({ loading: true });
       this.displayInfoLabel('Image restored');
@@ -115,33 +115,27 @@ class ImageEditor extends Component {
     if (this.state.loading) {
       return;
     }
-    // Run benchmarks here
+    worker.postMessage({
+      action: 'benchmarks',
+      img: this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
+    });
     this.displayInfoLabel('Benchmarks not supported yet');
   }
 
-  runBlur = () => {
-    if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
-      return;
-    }
-    this.setState({ loading: true });
-    const img = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-    worker.postMessage({
-      action: this.state.wasmMode ? 'blurWasm' : 'blurJs',
-      img
-    });
+  getAction = action => {
+    return this.state.wasmMode ? `${action}Wasm` : `${action}Js`;
   }
 
-  runBW = () => {
+  runAction = action => {
     if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
       return;
     }
     this.setState({ loading: true });
-    const img = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     worker.postMessage({
-      action: this.state.wasmMode ? 'bwWasm' : 'bwJs',
-      img
+      action: this.getAction(action),
+      img: this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
     });
-  }
+  };
 
   drawImage = (imgData, onResize = false) => {
     const reader = new FileReader();
@@ -169,7 +163,7 @@ class ImageEditor extends Component {
       <div className="component-wrapper">
         <Header title="Image Editor">
           <Label
-            text="Run benchmark"
+            text="Benchmark"
             className="benchmark-label"
             icon={<Icon name="benchmark" size="xs"/>}
             onClick={this.runBenchmarks}
@@ -181,19 +175,31 @@ class ImageEditor extends Component {
               icon={<Icon name="restore" size="s"/>}
               size="square"
               className="toolbar-button"
-              onClick={this.runReset}
+              onClick={(this.runRestore)}
             />
             <Label
-              text="BW"
+              text="Gray"
               size="square"
               className="toolbar-button"
-              onClick={this.runBW}
+              onClick={() => this.runAction('grayscale')}
             />
             <Label
-              text="Blur"
+              text="B.Blur"
               size="square"
               className="toolbar-button"
-              onClick={this.runBlur}
+              onClick={() => this.runAction('boxBlur')}
+            />
+            <Label
+              text="G.Blur"
+              size="square"
+              className="toolbar-button"
+              onClick={() => this.runAction('gaussianBlur')}
+            />
+            <Label
+              text="Sobel"
+              size="square"
+              className="toolbar-button"
+              onClick={() => this.runAction('sobel')}
             />
           </div>
         </Header>

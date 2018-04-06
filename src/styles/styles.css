@@ -249,9 +249,9 @@ a {
 }
 
 .label-square {
- width: 70px;
- height: 70px;
- font-size: 18px;
+  width: 60px;
+  height: 60px;
+  font-size: 14px;
 }
 
 .benchmark-label {
@@ -456,7 +456,7 @@ and (max-device-width : 767px) {
     right: -999px;
   }
   .toolbar-button {
-    margin-top: 20px;
+    margin-top: 15px;
   }
   .app-header-top {
     justify-content: space-between;
