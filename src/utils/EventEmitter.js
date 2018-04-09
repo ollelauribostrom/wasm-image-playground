@@ -1,7 +1,7 @@
 class EventEmitter {
-  
+
   constructor() {
-    this.listeners = {}
+    this.listeners = {};
   }
 
   on(event, fn) {
