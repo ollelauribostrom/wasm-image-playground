@@ -69,7 +69,7 @@ class FaceDetector extends Component {
   onDrop = ev => {
     ev.preventDefault();
     this.setState({ loading: true });
-    this.loadImages(ev.dataTransfer.files);
+    this.loadImages(ev.target.files || ev.dataTransfer.files);
   }
 
   loadImages = async fileList => {
@@ -124,7 +124,6 @@ class FaceDetector extends Component {
 
   render() {
     const images = this.state.images.map((image) => {
-      console.log(image);
       return (
         <img 
           src={image.data}
@@ -157,9 +156,10 @@ class FaceDetector extends Component {
         </Header>
         <div className="component-content image-container">
           { images }
-          <div className={`drop-info ${this.state.images.length ? 'drop-info-hidden' : ''}`}>
+          <div className={`drop-info ${this.state.images.length ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
             <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />
             <span>Drop images here</span>
+            <input type="file" className="hidden" ref={(input) => this.input = input} multiple onChange={this.onDrop} />
           </div>
           <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />
         </div>

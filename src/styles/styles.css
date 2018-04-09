@@ -172,6 +172,11 @@ a {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  z-index: 99;
+}
+
+.drop-info:hover {
+  cursor: pointer;
 }
 
 .drop-info-hidden {
@@ -287,22 +292,6 @@ a {
 .image-container {
   overflow-x: hidden;
   overflow-y: scroll;
-}
-
-.drop-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.drop-info-hidden {
-  display: none;
-}
-
-.drop-info span {
-  color: #5B5B5B;
-  margin-top: 10px;
 }
 
 .spinner {

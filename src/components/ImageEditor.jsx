@@ -69,7 +69,12 @@ class ImageEditor extends Component {
 
   onDrop = ev => {
     ev.preventDefault();
-    const file = ev.dataTransfer.files[0];
+    let file;
+    if (ev.target.files) {
+      file = ev.target.files[0];
+    } else {
+      file = ev.dataTransfer.files[0];
+    }
     if (isImage(file)) {
       this.setState({ originalImage: file, loading: true });
       this.drawImage(file);
@@ -154,10 +159,6 @@ class ImageEditor extends Component {
   }
 
   render() {
-    const dropInfoClassName = this.state.originalImage ? 'hidden' : 'drop-info';
-    const dropIconClassName = this.state.dragging ? 'drop' : 'drag';
-    const dropIconSize = this.state.dragging ? 'xl' : 'l';
-
     return (
       <div className="component-wrapper">
         <Header title="Image Editor">
@@ -203,9 +204,10 @@ class ImageEditor extends Component {
           </div>
         </Header>
         <div className="component-content" ref={contentWrapper => this.contentWrapper = contentWrapper}>
-          <div className={dropInfoClassName}>
-            <Icon name={dropIconClassName} size={dropIconSize} />
-            <span>Drop image here</span>
+        <div className={`drop-info ${this.state.originalImage ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
+            <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />
+            <span>Drop images here</span>
+            <input type="file" className="hidden" ref={(input) => this.input = input} onChange={this.onDrop} />
           </div>
           <canvas ref={canvas => this.canvas = canvas} className="image-editor-canvas" />
           <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />
