@@ -7,6 +7,7 @@ import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import ImageService from '../services/ImageService';
+import { imagesToUint8ClampedArray, Uint8ClampedArrayToImage } from '../utils/image';
 
 class FaceDetector extends Component {
   state = {
@@ -45,8 +46,13 @@ class FaceDetector extends Component {
   }
 
   onMessage = ({ data }) => {
-    if (data.images) {
-      this.setState({ images: data.images });
+    if (data.result) {
+      const images = data.result.map(({ data, id, containsFace }) => ({
+        data: Uint8ClampedArrayToImage(data),
+        id,
+        containsFace
+      }))
+      this.setState({ images });
     }
     this.displayInfoLabel(data.info);
     this.setState({ loading: false });
@@ -101,16 +107,16 @@ class FaceDetector extends Component {
     this.displayInfoLabel('Benchmarks not supported yet');
   }
 
-  runFaceDetection = () => {
+  runFaceDetection = async () => {
     if (this.state.loading || !this.props.serviceLoaded) {
       return;
     }
     if (this.state.images.length) {
-      this.setState({ loading: true })
-      // Run face detection here
+      this.setState({ loading: true });
+      const images = await imagesToUint8ClampedArray([...this.state.images]);
       ImageService.postMessage({
-        action: this.state.wasmMode? 'hasFaceWasm' : 'hasFaceJs',
-        images: this.state.images
+        action: this.state.wasmMode? 'containsFaceWasm' : 'containsFaceJs',
+        images
       })
     } else {
       this.displayInfoLabel('Upload some images first');

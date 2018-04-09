@@ -1,4 +1,4 @@
-import { gaussianBlur, grayscale, boxBlur, sobel } from 'imutils';
+import { gaussianBlur, grayscale, boxBlur, sobel, find } from 'imutils';
 import { timed } from '../utils/time';
 import { imshowWrapper } from '../utils/image';
 import makeCv from '../../lib/opencv_js';
@@ -17,12 +17,12 @@ onmessage = async ({ data }) => {
     grayscaleJs,
     sobelWasm,
     sobelJs,
-    hasFaceWasm,
-    hasFaceJs,
+    containsFaceWasm,
+    containsFaceJs,
     findFaceWasm,
     findFaceJs,
     findEyesWasm,
-    findEyesJs
+    findEyesJs,
   }[data.action];
 
   if (!action) {
@@ -39,6 +39,8 @@ function init(data) {
       makeCv()
         .then((instance) => {
           cv = instance;
+          cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_default.xml', '../lib/data/haarcascade_frontalface_default.xml', true, false);
+          cv.FS_createPreloadedFile('/', 'haarcascade_eye.xml', '../lib/data/haarcascade_eye.xml', true, false);
           loadingCv = false;
           console.log('Finished loading OpenCv');
           postMessage({ loaded: true })
@@ -153,22 +155,63 @@ function sobelJs({ img }, returnResult) {
   });   
 }
 
-function hasFaceWasm({ images }, returnResult) {
-  return performAction({
-    info: 'Found n images containing faces using WebAssembly',
-    returnResult
-  }, () => {
-    // Detect face in images here
-  });  
+function performFaceCount(config, fn) {
+  const { result, time, error } = timed(fn, config);
+  const { returnResult, language } = config;
+  const images = result.filter(img => img.faceCount > 0).length;
+  const faces = result.reduce((count, img) => count + img.faceCount, 0);
+  const faceNoun = faces === 1 ? 'face' : 'faces';
+  const imageNoun = images === 1 ? 'image' : 'images';
+  const info = `Found ${faces} ${faceNoun} in ${images} ${imageNoun}`;
+  if (returnResult) {
+    return { result, time, error };
+  }
+  postMessage({
+    result,
+    info: error || `${language}: ${info} - ${Math.round(time)}ms`,
+    time
+  });
 }
 
-function hasFaceJs({ images }, returnResult) {
-  return performAction({
-    info: 'Found n images containing faces using WebAssembly',
+function containsFaceWasm({ images }, returnResult) {
+  return performFaceCount({
+    action: 'detect faces',
+    language: 'WebAssembly',
     returnResult
   }, () => {
-    // Detect face in images here
-  });  
+    const faceCascade = new cv.CascadeClassifier();
+    faceCascade.load('haarcascade_frontalface_default.xml');
+    return images.map(img => {
+      const image = cv.matFromImageData(img.data);
+      const faces = new cv.RectVector();
+      cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY);
+      faceCascade.detectMultiScale(image, faces, 1.5, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
+      img.faceCount = faces.size();
+      image.delete();
+      faces.delete();
+      return img;
+    });
+  });
+}
+
+function containsFaceJs({ images }, returnResult) {
+  return performFaceCount({
+    action: 'detect faces',
+    language: 'WebAssembly',
+    returnResult
+  }, () => {
+    return images.map(img => {
+      const faces = find('face', img.data.data, img.data.width, img.data.height, {
+        edgesDensity: 0.2,
+        initialScale: 1.0,
+        scaleFactor: 1.5,
+        stepSize: 2
+      });
+      img.faces = faces;
+      img.faceCount = faces.length;
+      return img;
+    });
+  });
 }
 
 function findFaceWasm({ frame }) {
