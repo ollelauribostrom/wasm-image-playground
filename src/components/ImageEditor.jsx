@@ -7,9 +7,9 @@ import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import { resizeImage } from '../utils/image';
-import Worker from '../services/imageEditor.worker'; 
+import ImageService from '../services/ImageService';
 
-const worker = new Worker();
+// this.setState({ info: 'Loading editor...', editorLoaded: false });
 
 class ImageEditor extends Component {
   state = {
@@ -23,36 +23,41 @@ class ImageEditor extends Component {
   }
 
   componentDidMount() {
-    worker.postMessage({ action: 'status' });
-    worker.addEventListener('message', this.onMessage);
+    ImageService.on('message', this.onMessage);
     window.addEventListener('dragover', this.onDragOver);
     window.addEventListener('drop', this.onDrop);
     window.addEventListener('resize', this.onResize);
     this.ctx = this.canvas.getContext('2d');
     this.onResize();
+
+    if (!this.props.serviceLoaded) {
+      this.setState({ info: 'Loading OpenCv...' });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.serviceLoaded && !prevProps.serviceLoaded) {
+      const message = this.props.serviceError || 'Finished loading OpenCv';
+      this.displayInfoLabel(message);
+    }
   }
 
   componentWillUnmount() {
     window.clearTimeout(this.state.draggingTimeout);
     window.clearTimeout(this.state.infoTimeout);
-    worker.removeEventListener('message', this.onMessage);
+    ImageService.removeListener('message', this.onMessage);
     window.removeEventListener('dragover', this.onDragOver);
     window.removeEventListener('drop', this.onDrop);
     window.removeEventListener('resize', this.onResize);
   }
 
   onMessage = ({ data }) => {
-    if (data.img) {
+    if (data.result) {
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.ctx.putImageData(data.img, 0, 0);
-    }
-    if (data.editorLoaded === false) {
-      this.setState({ info: 'Loading editor...', editorLoaded: false });
-      worker.postMessage({ action: 'init' });
-      return;
+      this.ctx.putImageData(data.result, 0, 0);
     }
     this.displayInfoLabel(data.info);
-    this.setState({ loading: false, editorLoaded: true });
+    this.setState({ loading: false });
   }
 
   onDragOver = ev => {
@@ -112,13 +117,9 @@ class ImageEditor extends Component {
   }
 
   runBenchmarks = () => {
-    if (this.state.loading) {
+    if (this.state.loading || !this.props.serviceLoaded) {
       return;
     }
-    worker.postMessage({
-      action: 'benchmarks',
-      img: this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
-    });
     this.displayInfoLabel('Benchmarks not supported yet');
   }
 
@@ -127,11 +128,11 @@ class ImageEditor extends Component {
   }
 
   runAction = action => {
-    if (this.state.loading || !this.state.originalImage || !this.state.editorLoaded) {
+    if (this.state.loading || !this.state.originalImage || !this.props.serviceLoaded) {
       return;
     }
     this.setState({ loading: true });
-    worker.postMessage({
+    ImageService.postMessage({
       action: this.getAction(action),
       img: this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height)
     });
@@ -170,7 +171,7 @@ class ImageEditor extends Component {
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
-            <Spinner visible={this.state.loading || this.state.editorLoaded === false } color="#A599FF" />
+            <Spinner visible={this.state.loading || this.props.serviceLoaded === false } color="#A599FF" />
             <Label
               icon={<Icon name="restore" size="s"/>}
               size="square"
