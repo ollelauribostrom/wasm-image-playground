@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from  'react-router-dom';
 import Home from './Home';
 import ImageEditor from './ImageEditor';
-import ShapeDetector from './ShapeDetector';
+import FaceDetector from './FaceDetector';
 import Webcam from './Webcam';
 import GithubLink from './GithubLink';
 import ImageService from '../services/ImageService';
@@ -29,7 +29,7 @@ class App extends Component {
         <div className="App">
           <Route exact path="/" component={Home} />
           <Route path="/image-editor" render={() => <ImageEditor {...this.state} />} />
-          <Route path="/shape-detector" render={() => <ShapeDetector {...this.state} />} />
+          <Route path="/face-detector" render={() => <FaceDetector {...this.state} />} />
           <Route path="/webcam" render={() => <Webcam {...this.state} />} />
           <GithubLink />
         </div>

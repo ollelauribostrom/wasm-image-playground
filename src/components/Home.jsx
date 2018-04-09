@@ -39,9 +39,9 @@ function Home() {
             className="Home-link"
           />
         </Link>
-        <Link to="/shape-detector">
+        <Link to="/face-detector">
           <Label
-            text="Shape Detector"
+            text="Face Detector"
             color="#654FF0"
             size="large"
             className="Home-link"

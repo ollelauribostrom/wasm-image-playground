@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
+import { asyncImageListLoader } from 'imutils';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
 import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
-import { isImage, asyncImageListLoader } from '../utils/image';
-import Worker from '../services/shapeDetector.worker';
+import ImageService from '../services/ImageService';
 
-const worker = new Worker();
-
-class ShapeDetector extends Component {
+class FaceDetector extends Component {
   state = {
     wasmMode: false,
     loading: false,
@@ -22,15 +20,36 @@ class ShapeDetector extends Component {
   }
 
   componentDidMount() {
+    ImageService.on('message', this.onMessage);
     window.addEventListener('dragover', this.onDragOver);
     window.addEventListener('drop', this.onDrop);
+
+    if (!this.props.serviceLoaded) {
+      this.setState({ info: 'Loading OpenCv...' });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.serviceLoaded && !prevProps.serviceLoaded) {
+      const message = this.props.serviceError || 'Finished loading OpenCv';
+      this.displayInfoLabel(message);
+    }
   }
 
   componentWillUnmount() {
+    ImageService.removeListener('message', this.onMessage);
     window.clearTimeout(this.state.draggingTimeout);
     window.clearTimeout(this.state.infoTimeout);
     window.removeEventListener('dragover', this.onDragOver);
     window.removeEventListener('drop', this.onDrop);
+  }
+
+  onMessage = ({ data }) => {
+    if (data.images) {
+      this.setState({ images: data.images });
+    }
+    this.displayInfoLabel(data.info);
+    this.setState({ loading: false });
   }
 
   onDragOver = ev => {
@@ -82,36 +101,20 @@ class ShapeDetector extends Component {
     this.displayInfoLabel('Benchmarks not supported yet');
   }
 
-  runSquareDetection = () => {
-    if (this.state.loading) {
+  runFaceDetection = () => {
+    if (this.state.loading || !this.props.serviceLoaded) {
       return;
     }
     if (this.state.images.length) {
-      // Run square detection here
-      worker.postMessage({
-        action: this.state.wasmMode? 'detectSquaresWasm' : 'detectSquaresJs'
+      this.setState({ loading: true })
+      // Run face detection here
+      ImageService.postMessage({
+        action: this.state.wasmMode? 'hasFaceWasm' : 'hasFaceJs',
+        images: this.state.images
       })
-      this.displayInfoLabel('Square detection not implemented yet (running fake)');
-      this.fakeSquareDetection();
     } else {
       this.displayInfoLabel('Upload some images first');
     }
-  }
-
-  fakeSquareDetection = () => {
-    this.setState({ loading: true })
-    window.setTimeout(() => {
-      const images = [...this.state.images];
-      let squareCount = 0;
-      images.map((image, i) => {
-        if (i % 2 === 0) {
-          image.hasSquare = true;
-          squareCount++;
-        }
-      });
-      this.setState({ images, loading: false })
-      this.displayInfoLabel(`Detected ${squareCount} images containing squares in 1365ms`);
-    }, 2000)
   }
 
   render() {
@@ -120,7 +123,7 @@ class ShapeDetector extends Component {
         <img 
           src={image.data}
           alt="uploaded"
-          className={`uploaded-image ${image.hasSquare ? 'has-square' : ''}`}
+          className={`uploaded-image ${image.containsFace ? 'contains-face' : ''}`}
           key={image.id}
         />
       )
@@ -128,7 +131,7 @@ class ShapeDetector extends Component {
 
     return (
       <div className="component-wrapper">
-        <Header title="Shape detector">
+        <Header title="Face Detector">
           <Label
             text="Run benchmark"
             className="benchmark-label"
@@ -137,12 +140,12 @@ class ShapeDetector extends Component {
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
-            <Spinner visible={this.state.loading} color="#A599FF" />
+            <Spinner visible={this.state.loading || !this.props.serviceLoaded} color="#A599FF" />
             <Label
-              text="Detect Squares"
+              text="Detect Faces"
               size="large"
               className="toolbar-button"
-              onClick={this.runSquareDetection}
+              onClick={this.runFaceDetection}
             />
           </div>
         </Header>
@@ -159,4 +162,4 @@ class ShapeDetector extends Component {
   }
 }
 
-export default ShapeDetector;
+export default FaceDetector;
