@@ -47,10 +47,9 @@ class FaceDetector extends Component {
 
   onMessage = ({ data }) => {
     if (data.result) {
-      const images = data.result.map(({ data, id, containsFace }) => ({
+      const images = data.result.map(({ data, ...props }) => ({
         data: Uint8ClampedArrayToImage(data),
-        id,
-        containsFace
+        ...props
       }))
       this.setState({ images });
     }
@@ -125,11 +124,12 @@ class FaceDetector extends Component {
 
   render() {
     const images = this.state.images.map((image) => {
+      console.log(image);
       return (
         <img 
           src={image.data}
           alt="uploaded"
-          className={`uploaded-image ${image.containsFace ? 'contains-face' : ''}`}
+          className={`uploaded-image ${image.faceCount > 0 ? 'contains-face' : ''}`}
           key={image.id}
         />
       )
@@ -139,7 +139,7 @@ class FaceDetector extends Component {
       <div className="component-wrapper">
         <Header title="Face Detector">
           <Label
-            text="Run benchmark"
+            text="Benchmark"
             className="benchmark-label"
             icon={<Icon name="benchmark" size="xs"/>}
             onClick={this.runBenchmarks}

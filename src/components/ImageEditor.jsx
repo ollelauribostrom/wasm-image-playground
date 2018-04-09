@@ -9,15 +9,13 @@ import InfoLabel from './InfoLabel';
 import { resizeImage } from '../utils/image';
 import ImageService from '../services/ImageService';
 
-// this.setState({ info: 'Loading editor...', editorLoaded: false });
-
 class ImageEditor extends Component {
   state = {
     wasmMode: false,
     loading: false,
     dragging: false,
     draggingTimeout: null,
-    info: [],
+    info: null,
     infoTimeout: null,
     image: null
   }
@@ -170,7 +168,7 @@ class ImageEditor extends Component {
             onClick={this.runBenchmarks}
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
-          <div className="toolbar">
+          <div className="toolbar image-editor-toolbar">
             <Spinner visible={this.state.loading || this.props.serviceLoaded === false } color="#A599FF" />
             <Label
               icon={<Icon name="restore" size="s"/>}

@@ -421,8 +421,21 @@ and (max-device-width : 1024px)  {
   .Home-wrapper {
     padding: 100px;
   }
+  .image-editor-toolbar {
+    flex-direction: row-reverse;
+    margin: 20px auto;
+  }
+  .image-editor-toolbar .toolbar-button {
+    margin: 0px 20px 0 0;
+  }
   .icon-xxl {
     width: 80px;
+  }
+  .info-label {
+    right: 0;
+  }
+  .info-label-hidden {
+    right: -999px;
   }
   .label-small {
     align-self: flex-end;
@@ -460,5 +473,54 @@ and (max-device-width : 767px) {
   }
   .app-header-top {
     justify-content: space-between;
+  }
+  .Webcam-canvas {
+    max-width: 80%;
+  }
+  .image-editor-toolbar {
+    flex-direction: row;
+    margin: 20px 0 0 0;
+    width: 100%;
+  }
+  .image-editor-toolbar .spinner {
+    display: none;
+  }
+  .image-editor-toolbar .toolbar-button {
+    margin: 0px 5px 0 0;
+  }
+  .app-header {
+    margin-bottom: 20px
+  }
+  .Home {
+    display: block;
+  }
+  .Home-wrapper {
+    width: 70%;
+    margin: 40px auto;
+    padding: 0;
+  }
+  .gh-link {
+    bottom: 0px;
+    right: 0px;
+    background-color: #b3ffae;
+    padding: 10px;
+  }
+  .Home .app-header-title {
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: baseline;
+  }
+  .Home .app-header-title img {
+    margin-right: 10px;
+    margin-bottom: 10px;
+  }
+  .Home .app-header-title-light {
+    padding: 0;
+    font-size: 23px;
+  }
+  .Home-link {
+    padding: 20px 0;
+    font-size: 18px;
+    width: 100%;
   }
 }
