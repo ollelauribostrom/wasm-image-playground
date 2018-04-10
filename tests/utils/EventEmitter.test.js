@@ -1,4 +1,4 @@
-import EventEmitter from '../src/utils/EventEmitter';
+import EventEmitter from '../../src/utils/EventEmitter';
 
 describe('{unit} EventEmitter', () => {
   it('is possible to listen to an event', async () => {

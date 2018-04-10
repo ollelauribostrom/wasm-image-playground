@@ -1,4 +1,4 @@
-import timed from '../src/utils/timed';
+import timed from '../../src/utils/timed';
 
 describe('{unit} time', () => {
   it('runs the function', async () => {
