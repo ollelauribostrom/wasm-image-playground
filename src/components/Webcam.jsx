@@ -5,13 +5,13 @@ import Label from './Label';
 import WasmMode from './WasmMode';
 import InfoLabel from './InfoLabel';
 import glasses from '../assets/glasses.svg';
-import Worker from '../services/webcam.worker';
-
-const worker = new Worker();
+import ImageService from '../services/ImageService';
+import { calcEyesPosition } from '../utils/image';
 
 class Webcam extends Component {
   state = {
     fps: 0,
+    fpsArr: [],
     blurMode: true,
     wasmMode: false,
     info: null,
@@ -19,13 +19,18 @@ class Webcam extends Component {
   }
 
   async componentDidMount() {
-    try {
-      const constraints = { audio: false, video: true };
-      this.video.srcObject = await window.navigator.mediaDevices.getUserMedia(constraints);
-      this.ctx = this.canvas.getContext('2d');
-      window.requestAnimationFrame(this.updateCanvas)
-    } catch (err) {
-      this.setState({ error: 'No Webcam access' })
+    ImageService.on('message', this.onMessage);
+    if (!this.props.serviceLoaded) {
+      return this.setState({ info: 'Loading OpenCv...' });
+    }
+    this.startCamera();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.serviceLoaded && !prevProps.serviceLoaded) {
+      const message = this.props.serviceError || 'Finished loading OpenCv';
+      this.displayInfoLabel(message);
+      this.startCamera();
     }
   }
 
@@ -33,8 +38,23 @@ class Webcam extends Component {
     if (this.video.srcObject) {
       this.video.srcObject.getTracks()[0].stop();
     }
+    ImageService.removeListener('message', this.onMessage);
     window.clearTimeout(this.state.infoTimeout);
-    window.cancelAnimationFrame(this.updateCanvas);
+    window.cancelAnimationFrame(this.animationFrame);
+  }
+
+  startCamera = async () => {
+    try {
+      if (this.props.serviceLoaded) {
+        const constraints = { audio: false, video: true };
+        this.video.srcObject = await window.navigator.mediaDevices.getUserMedia(constraints);
+        this.ctx = this.canvas.getContext('2d');
+        const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+        setTimeout(() => this.getNextFrame(frame), 1000);
+      }
+    } catch (err) {
+      this.setState({ error: 'No Webcam access' });
+    }
   }
 
   displayInfoLabel = info => {
@@ -47,60 +67,43 @@ class Webcam extends Component {
     this.setState({ info: null })
   }
 
-  updateFps = (now) => {
-    // Pretty much fake
-    let fps = 0;
-    const { lastTimeCalled } = this.state;
-    if (lastTimeCalled) {
-      fps = Math.ceil(1 / ((now - lastTimeCalled) / 1000));
-    }
-    this.setState({ fps, lastTimeCalled: now });
-  }
-
-  updateCanvas = async (timeStamp) => {
-    if (!this.canvas) {
-      return;
-    }
-    
+  onMessage = ({ data }) => {
+    console.log(data);
     this.ctx.clearRect(0, 0, 400, 400);
     this.ctx.filter = 'none';
     this.ctx.drawImage(this.video, 0, 0);
-
-    if (this.state.blurMode) {
-      this.runBlur();
-    } else {
-      this.runGlasses();
+    const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    if (this.state.lastTimeUpdated) {
+      this.setState({ fps: Math.round(1000 / (data.time - this.state.lastTimeUpdated)) })
     }
-
-    this.updateFps(timeStamp);
-    window.requestAnimationFrame(this.updateCanvas);
+    this.setState({ lastTimeUpdated: data.time })
+    if (data.type === 'face') {
+      this.ctx.filter = 'blur(10px)';
+      for (let i = 0; i < data.face.length; i += 1) {
+        const { x, y, height, width } = data.face[i];
+        this.ctx.drawImage(this.video, x, y, width, height, x, y, width, height);
+      }
+    } else if (data.type === 'eyes' && data.eyes.length) {
+      const { x, y, height, width } = calcEyesPosition(data.eyes);
+      const img = new Image();
+      img.src = glasses;
+      this.ctx.drawImage(img, x, y, width, height);
+    }
+    this.getNextFrame(frame);
   }
 
-  activateBlurMode = () => {
-    this.setState({ blurMode: true });
+  getAction = action => {
+    if (this.state.wasmMode) {
+      return this.state.blurMode ? 'findFaceWasm' : 'findEyesWasm';
+    }
+    return this.state.blurMode ? 'findFaceJs' : 'findEyesJs';
   }
 
-  activateGlassesMode = () => {
-    this.setState({ blurMode: false });
-  }
-
-  runBlur = (area) => {
-    this.ctx.filter = 'blur(10px)';
-    // Perform face detection here to know where to place blur
-    worker.postMessage({
-      action: this.state.wasmMode ? 'faceDetectionWasm' : 'faceDetectionJs'
-    })
-    this.ctx.drawImage(this.video, 100, 100, 100, 100, 100, 100, 100, 100);
-  }
-
-  runGlasses = () => {
-    const img = new Image();
-    img.src = glasses
-    // Perform eye tracking here to know where to place glasses
-    worker.postMessage({
-      action: this.state.wasmMode ? 'eyeDetectionWasm' : 'eyeDetectionJs'
-    })
-    this.ctx.drawImage(img, 100, 100)
+  getNextFrame = frame => {
+    ImageService.postMessage({
+      action: this.getAction(),
+      frame,
+    });
   }
 
   toggleWasmMode = () => {
@@ -123,7 +126,7 @@ class Webcam extends Component {
         <Icon
           name="face-active"
           size="xxl"
-          onClick={this.activateBlurMode}
+          onClick={() => this.setState({ blurMode: true })}
           className={this.state.blurMode ? 'webcam-icon' : 'webcam-icon-inactive'}
         />
         <video ref={video => this.video = video } autoPlay={true} className="Webcam-video"/>
@@ -131,7 +134,7 @@ class Webcam extends Component {
         <Icon
           name="glasses-active"
           size="xxl"
-          onClick={this.activateGlassesMode}
+          onClick={() => this.setState({ blurMode: false })}
           className={this.state.blurMode ? 'webcam-icon-inactive' : 'webcam-icon'}
         />
         <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />

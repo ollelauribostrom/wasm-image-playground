@@ -7393,6 +7393,10 @@ uid-number@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/uid-number/-/uid-number-0.0.6.tgz#0ea10e8035e8eb5b8e4449f06da1c730663baa81"
 
+uint8clampedarray-utils@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/uint8clampedarray-utils/-/uint8clampedarray-utils-1.0.2.tgz#cf472c9eafca081024dc270e84b26d8d611b395e"
+
 underscore@~1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.6.0.tgz#8b38b10cacdef63337b8b24e4ff86d45aea529a8"

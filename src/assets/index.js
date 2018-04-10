@@ -34,4 +34,4 @@ export default {
   wasm,
   'glasses-active': glassesActive,
   'face-active': faceActive
-}
+};

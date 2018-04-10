@@ -16,7 +16,7 @@ export function resizeImage(img, maxWidth, maxHeight) {
 
 export function imshowWrapper(imageMat, cv) {
   if(!(imageMat instanceof cv.Mat)) {
-    throw new Error("Please input the valid cv.Mat instance.");
+    throw new Error('Please input the valid cv.Mat instance.');
   }
   const outImageMat = new cv.Mat();
   const depth = imageMat.type() % 8;
@@ -33,7 +33,7 @@ export function imshowWrapper(imageMat, cv) {
     case cv.CV_8UC4:
       break;
     default:
-      throw new Error("Bad number of channels (Source image must have 1, 3 or 4 channels)");
+      throw new Error('Bad number of channels (Source image must have 1, 3 or 4 channels)');
   }
   const imgData = new ImageData(new Uint8ClampedArray(outImageMat.data), outImageMat.cols, outImageMat.rows);
   outImageMat.delete();
@@ -60,7 +60,7 @@ export function imageToUint8ClampedArray(img) {
       resolve(ctx.getImageData(0, 0, canvas.width, canvas.height));
     };
     image.src = img;
-  })
+  });
 }
 
 export function Uint8ClampedArrayToImage(imageData) {
@@ -70,4 +70,14 @@ export function Uint8ClampedArrayToImage(imageData) {
   const ctx = canvas.getContext('2d');
   ctx.putImageData(imageData, 0, 0);
   return canvas.toDataURL();
+}
+
+export function calcEyesPosition(eyes) {
+  let sortedEyes = eyes.sort((a, b) => a.x - b.x);
+  return {
+    x: sortedEyes[0].x,
+    y: sortedEyes[0].y,
+    width: (sortedEyes[eyes.length - 1].x - sortedEyes[0].x) * 2 ,
+    height: sortedEyes[0].height
+  }
 }

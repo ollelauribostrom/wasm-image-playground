@@ -1,10 +1,12 @@
 import { gaussianBlur, grayscale, boxBlur, sobel, find } from 'imutils';
-import { timed } from '../utils/time';
+import timed from '../utils/timed';
 import { imshowWrapper } from '../utils/image';
 import makeCv from '../../lib/opencv_js';
 
 let cv;
 let loadingCv;
+let faceCascade;
+let eyesCascade;
 
 onmessage = async ({ data }) => {
   const action = {
@@ -29,7 +31,7 @@ onmessage = async ({ data }) => {
     throw new Error(`Action ${data.action} does not exist`);
   }
   action(data);
-}
+};
 
 function init(data) {
   if (!cv && !loadingCv) {
@@ -43,12 +45,12 @@ function init(data) {
           cv.FS_createPreloadedFile('/', 'haarcascade_eye.xml', '../lib/data/haarcascade_eye.xml', true, false);
           loadingCv = false;
           console.log('Finished loading OpenCv');
-          postMessage({ loaded: true })
+          postMessage({ loaded: true });
         })
         .catch((error) => {
           loadingCv = false;
           console.error('Error loading OpenCv', error);
-          postMessage({ error })
+          postMessage({ error });
         });
     } catch (err) {
       // silently fail (errors caused by WebAssembly.instantiateStreaming not being supported)
@@ -141,7 +143,7 @@ function sobelWasm({ img }, returnResult) {
     const image = cv.matFromImageData(img);
     cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 4);
     cv.Sobel(image, image, cv.CV_8U, 1, 0, 3, 1, 0, cv.BORDER_DEFAULT);
-    return imshowWrapper(image, cv)
+    return imshowWrapper(image, cv);
   });  
 }
 
@@ -153,6 +155,20 @@ function sobelJs({ img }, returnResult) {
     const output = sobel(img.data, img.width, img.height);
     return new ImageData(Uint8ClampedArray.from(output), img.width, img.height);
   });   
+}
+
+function loadFaceCascade() {
+  if (faceCascade === undefined) {
+    faceCascade = new cv.CascadeClassifier();
+    faceCascade.load('haarcascade_frontalface_default.xml');
+  }
+}
+
+function loadEyesCascade() {
+  if (eyesCascade === undefined) {
+    eyesCascade = new cv.CascadeClassifier();
+    eyesCascade.load('haarcascade_eye.xml');
+  }
 }
 
 function performFaceCount(config, fn) {
@@ -174,13 +190,12 @@ function performFaceCount(config, fn) {
 }
 
 function containsFaceWasm({ images }, returnResult) {
+  loadFaceCascade();
   return performFaceCount({
     action: 'detect faces',
     language: 'WebAssembly',
     returnResult
   }, () => {
-    const faceCascade = new cv.CascadeClassifier();
-    faceCascade.load('haarcascade_frontalface_default.xml');
     return images.map(img => {
       const image = cv.matFromImageData(img.data);
       const faces = new cv.RectVector();
@@ -197,17 +212,16 @@ function containsFaceWasm({ images }, returnResult) {
 function containsFaceJs({ images }, returnResult) {
   return performFaceCount({
     action: 'detect faces',
-    language: 'WebAssembly',
+    language: 'JS',
     returnResult
   }, () => {
     return images.map(img => {
       const faces = find('face', img.data.data, img.data.width, img.data.height, {
-        edgesDensity: 0.2,
-        initialScale: 1.0,
-        scaleFactor: 1.5,
+        edgesDensity: 0.1,
+        initialScale: 4,
+        scaleFactor: 1.25,
         stepSize: 2
       });
-      img.faces = faces;
       img.faceCount = faces.length;
       return img;
     });
@@ -215,25 +229,86 @@ function containsFaceJs({ images }, returnResult) {
 }
 
 function findFaceWasm({ frame }) {
-  return performAction({}, () => {
-    // Find face
+  loadFaceCascade();
+  const image = cv.matFromImageData(frame, 24);
+  const faces = new cv.RectVector();
+  const faceRects = [];
+  faceCascade.detectMultiScale(image, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
+  for(let i = 0; i < faces.size(); i+= 1) {
+    faceRects.push(faces.get(i));
+  }
+  image.delete();
+  faces.delete();
+  postMessage({
+    face: faceRects,
+    language: 'WebAssembly',
+    type: 'face',
+    time: performance.now()
   });
 }
 
 function findFaceJs({ frame }) {
-  return performAction({}, () => {
-    // Find face
+  const face = find('face', frame.data, frame.width, frame.height, {
+    edgesDensity: 0.1,
+    initialScale: 4,
+    scaleFactor: 1.25,
+    stepSize: 2
+  });
+  postMessage({
+    face,
+    language: 'JS',
+    type: 'face',
+    time: performance.now()
   });
 }
 
 function findEyesWasm({ frame }) {
-  return performAction({}, () => {
-    // Find eyes
+  loadFaceCascade();
+  loadEyesCascade();
+  const image = cv.matFromImageData(frame, 24);
+  const imageGray = new cv.Mat();
+  const faces = new cv.RectVector();
+  const eyesRect = [];
+  cv.cvtColor(image, imageGray, cv.COLOR_RGBA2GRAY, 0);
+  faceCascade.detectMultiScale(imageGray, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
+  for(let i = 0; i < faces.size(); i+= 1) {
+    const faceRect = faces.get(i)
+    const faceGray = imageGray.roi(faceRect);
+		const eyes = new cv.RectVector();
+		eyesCascade.detectMultiScale(faceGray, eyes, 1.6, 2, 0);
+		for (let j = 0; j < eyes.size(); j += 1) {
+      let eyeRect = eyes.get(j);
+			eyesRect.push({
+        x: faceRect.x + eyeRect.x,
+        y: faceRect.y + eyeRect.y,
+        width: eyeRect.width,
+        height: eyeRect.height
+      });
+		}
+		eyes.delete();
+  }
+  image.delete();
+  imageGray.delete();
+  faces.delete();
+  postMessage({
+    eyes: eyesRect,
+    language: 'WebAssembly',
+    type: 'eyes',
+    time: performance.now()
   });
 }
 
 function findEyesJs({ frame }) {
-  return performAction({}, () => {
-    // Find eyes
+  const eyes = find('eye', frame.data, frame.width, frame.height, {
+    edgesDensity: 0.1,
+    initialScale: 4,
+    scaleFactor: 1.6,
+    stepSize: 2
+  });
+  postMessage({
+    eyes,
+    language: 'JS',
+    type: 'eyes',
+    time: performance.now()
   });
 }
