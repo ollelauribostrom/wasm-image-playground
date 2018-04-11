@@ -131,7 +131,11 @@ class ImageEditor extends Component {
   }
 
   runAction = action => {
-    if (this.state.loading || !this.state.originalImage || !this.props.serviceLoaded) {
+    if (this.state.loading || !this.props.serviceLoaded) {
+      return;
+    }
+    if (!this.state.originalImage) {
+      this.displayInfoLabel('Upload an image first');
       return;
     }
     this.setState({ loading: true });
@@ -200,7 +204,7 @@ class ImageEditor extends Component {
         <div className="component-content" ref={contentWrapper => this.contentWrapper = contentWrapper}>
         <div className={`drop-info ${this.state.originalImage ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
             <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />
-            <span>Drop images here</span>
+            <span>Drop images here (or click to choose a file)</span>
             <input type="file" className="hidden" ref={(input) => this.input = input} onChange={this.onDrop} />
           </div>
           <canvas ref={canvas => this.canvas = canvas} className="image-editor-canvas" />
