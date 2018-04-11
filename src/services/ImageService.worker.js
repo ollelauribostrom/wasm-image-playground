@@ -1,4 +1,4 @@
-import { gaussianBlur, grayscale, boxBlur, sobel, find } from 'imutils';
+import { gaussianBlur, grayscale, boxBlur, find } from 'imutils';
 import timed from '../utils/timed';
 import { imshowWrapper } from '../utils/image';
 import makeCv from '../../lib/opencv_js';
@@ -17,8 +17,6 @@ onmessage = async ({ data }) => {
     gaussianBlurJs,
     grayscaleWasm,
     grayscaleJs,
-    sobelWasm,
-    sobelJs,
     containsFaceWasm,
     containsFaceJs,
     findFaceWasm,
@@ -76,9 +74,11 @@ function gaussianBlurWasm({ img }, returnResult) {
     returnResult
   }, () => {
     const image = cv.matFromImageData(img);
+    const output = new cv.Mat();
     const size = new cv.Size(9, 9);
-    cv.GaussianBlur(image, image, size, 0, 0, cv.BORDER_DEFAULT);
-    return imshowWrapper(image, cv);
+    cv.GaussianBlur(image, output, size, 0, 0, cv.BORDER_DEFAULT);
+    image.delete();
+    return imshowWrapper(output, cv);
   });
 }
 
@@ -98,17 +98,25 @@ function grayscaleWasm({ img }, returnResult) {
     returnResult
   }, () => {
     const image = cv.matFromImageData(img);
-    cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 4);
-    return imshowWrapper(image, cv);
+    const output = new cv.Mat();
+    cv.cvtColor(image, output, cv.COLOR_RGBA2GRAY, 4);
+    image.delete();
+    return imshowWrapper(output, cv);
   });
 }
 
 function grayscaleJs({ img }, returnResult) {
   return performAction({
     info: 'Converted image to grayscale using JS',
-    returnResult
+    returnResult,
+    debug: true
   }, () => {
-    const gray = grayscale(img.data, img.width, img.height, true);
+    const gray = grayscale(img.data, img.width, img.height, true, {
+      red: 0.299,
+      green: 0.587,
+      blue: 0.114,
+      alpha: 255
+    });
     return new ImageData(gray, img.width, img.height);
   });
 }
@@ -120,8 +128,10 @@ function boxBlurWasm({ img }, returnResult) {
   }, () => {
     const size = new cv.Size(3, 3);
     const image = cv.matFromImageData(img);
-    cv.blur(image, image, size);
-    return imshowWrapper(image, cv);
+    const output = new cv.Mat();
+    cv.blur(image, output, size);
+    image.delete();
+    return imshowWrapper(output, cv);
   });  
 }
 
@@ -133,28 +143,6 @@ function boxBlurJs({ img }, returnResult) {
     const blurred = boxBlur(img.data, img.width);
     return new ImageData(blurred, img.width, img.height);
   });
-}
-
-function sobelWasm({ img }, returnResult) {
-  return performAction({
-    info: 'Applied Sobel filter using WebAssembly',
-    returnResult
-  }, () => {
-    const image = cv.matFromImageData(img);
-    cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 4);
-    cv.Sobel(image, image, cv.CV_8U, 1, 0, 3, 1, 0, cv.BORDER_DEFAULT);
-    return imshowWrapper(image, cv);
-  });  
-}
-
-function sobelJs({ img }, returnResult) {
-  return performAction({
-    info: 'Applied Sobel filter using JS',
-    returnResult
-  }, () => {
-    const output = sobel(img.data, img.width, img.height);
-    return new ImageData(Uint8ClampedArray.from(output), img.width, img.height);
-  });   
 }
 
 function loadFaceCascade() {

@@ -195,12 +195,6 @@ class ImageEditor extends Component {
               className="toolbar-button"
               onClick={() => this.runAction('gaussianBlur')}
             />
-            <Label
-              text="Sobel"
-              size="square"
-              className="toolbar-button"
-              onClick={() => this.runAction('sobel')}
-            />
           </div>
         </Header>
         <div className="component-content" ref={contentWrapper => this.contentWrapper = contentWrapper}>
