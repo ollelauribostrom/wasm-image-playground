@@ -171,6 +171,7 @@ class ImageEditor extends Component {
             className="benchmark-label"
             icon={<Icon name="benchmark" size="xs"/>}
             onClick={this.runBenchmarks}
+            title="Run benchmark"
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar image-editor-toolbar">
@@ -180,24 +181,28 @@ class ImageEditor extends Component {
               size="square"
               className="toolbar-button"
               onClick={(this.runRestore)}
+              title="Restore image"
             />
             <Label
               text="Gray"
               size="square"
               className="toolbar-button"
               onClick={() => this.runAction('grayscale')}
+              title="Convert image to grayscale"
             />
             <Label
               text="B.Blur"
               size="square"
               className="toolbar-button"
               onClick={() => this.runAction('boxBlur')}
+              title="Apply Box Blur"
             />
             <Label
               text="G.Blur"
               size="square"
               className="toolbar-button"
               onClick={() => this.runAction('gaussianBlur')}
+              title="Apply Gaussian Blur"
             />
           </div>
         </Header>

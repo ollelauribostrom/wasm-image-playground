@@ -2,7 +2,7 @@ import React from 'react';
 import Icon from './Icon';
 import Label from './Label';
 
-function WasmMode({ wasmMode, onClick }) {
+function WasmMode({ wasmMode, onClick, ...props }) {
   const text = wasmMode ? 'WebAssembly' : 'JavaScript';
   const className = wasmMode ? 'wasm-mode' : 'js-mode';
   return (
@@ -11,6 +11,7 @@ function WasmMode({ wasmMode, onClick }) {
       className={className}
       onClick={onClick}
       icon={<Icon name="change" size="xs"/>}
+      title="Toggle WebAssembly/JavaScript mode"
     />
   )
 }

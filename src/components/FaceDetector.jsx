@@ -125,12 +125,15 @@ class FaceDetector extends Component {
   render() {
     const images = this.state.images.map((image) => {
       return (
-        <img 
-          src={image.data}
-          alt="uploaded"
-          className={`uploaded-image ${image.faceCount > 0 ? 'contains-face' : ''}`}
-          key={image.id}
-        />
+        <div class="uploaded-image">
+         {image.faceCount ? <span>{image.faceCount}</span> : null }
+          <img 
+            src={image.data}
+            alt="uploaded"
+            className={image.faceCount > 0 ? 'contains-face' : ''}
+            key={image.id}
+          />
+        </div>
       )
     })
 
@@ -142,15 +145,24 @@ class FaceDetector extends Component {
             className="benchmark-label"
             icon={<Icon name="benchmark" size="xs"/>}
             onClick={this.runBenchmarks}
+            title="Run benchmark"
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
             <Spinner visible={this.state.loading || !this.props.serviceLoaded} color="#A599FF" />
             <Label
+              icon={<Icon name="close-white" size="s"/>}
+              size="square"
+              className="toolbar-button"
+              onClick={() => this.setState({ images: [] })}
+              title="Clear uploaded images"
+            />
+            <Label
               text="Detect Faces"
               size="large"
               className="toolbar-button"
               onClick={this.runFaceDetection}
+              title="Detect Faces"
             />
           </div>
         </Header>
@@ -158,7 +170,7 @@ class FaceDetector extends Component {
           { images }
           <div className={`drop-info ${this.state.images.length ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
             <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />
-            <span>Drop images here</span>
+            <span>Drop images here (or click to choose a file)</span>
             <input type="file" className="hidden" ref={(input) => this.input = input} multiple onChange={this.onDrop} />
           </div>
           <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />

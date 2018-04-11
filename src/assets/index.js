@@ -3,6 +3,7 @@ import benchmark from './benchmark.svg';
 import change from './change.svg';
 import check from './check.svg';
 import close from './close.svg';
+import closeWhite from './close-white.svg';
 import cross from './cross.svg';
 import drag from './drag.svg';
 import drop from './drop.svg';
@@ -33,5 +34,6 @@ export default {
   sad,
   wasm,
   'glasses-active': glassesActive,
-  'face-active': faceActive
+  'face-active': faceActive,
+  'close-white': closeWhite
 };
