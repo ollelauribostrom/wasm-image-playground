@@ -5,12 +5,14 @@ function Label({
   size = 'small',
   className = '',
   icon = null,
-  onClick = () => {}
+  onClick = () => {},
+  ...props
 }) {
   return (
     <div
       className={`label label-${size} ${className}`}
       onClick={onClick}
+      {...props}
     >
       <span>{text}</span>
       {icon}
