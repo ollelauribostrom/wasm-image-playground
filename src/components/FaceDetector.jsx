@@ -6,6 +6,7 @@ import Label from './Label';
 import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
+import Benchmark from './Benchmark';
 import ImageService from '../services/ImageService';
 import { imagesToUint8ClampedArray, Uint8ClampedArrayToImage } from '../utils/image';
 
@@ -98,13 +99,25 @@ class FaceDetector extends Component {
     this.setState({ info: null })
   }
 
-  runBenchmarks = () => {
-    if (this.state.loading) {
+  onBenchmarkOpen = () => {
+    if (!this.props.serviceLoaded) {
       return;
     }
-    // Run benchmarks here
-    this.displayInfoLabel('Benchmarks not supported yet');
+    this.setState({ showBenchmark: true });
   }
+
+  onBenchmarkStart = () => {
+    this.setState({ info: 'Running benchmarks..'  });
+  }
+
+  onBenchmarkStop = () => {
+    this.dismissInfoLabel();
+    this.setState({ showBenchmark: true });
+  }
+
+  onBenchmarkClose = () => {
+    this.setState({ showBenchmark: false });
+  };
 
   runFaceDetection = async () => {
     if (this.state.loading || !this.props.serviceLoaded) {
@@ -144,7 +157,7 @@ class FaceDetector extends Component {
             text="Benchmark"
             className="benchmark-label"
             icon={<Icon name="benchmark" size="xs"/>}
-            onClick={this.runBenchmarks}
+            onClick={this.onBenchmarkOpen}
             title="Run benchmark"
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
@@ -167,6 +180,14 @@ class FaceDetector extends Component {
           </div>
         </Header>
         <div className="component-content image-container">
+          <Benchmark
+            title="Face Detector"
+            benchmarkType="faceDetectorBenchmark"
+            isOpen={this.state.showBenchmark}
+            onClose={this.onBenchmarkClose}
+            onStart={this.onBenchmarkStart}
+            onStop={this.onBenchmarkStop}
+          />
           { images }
           <div className={`drop-info ${this.state.images.length ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
             <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />

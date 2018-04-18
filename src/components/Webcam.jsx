@@ -12,7 +12,7 @@ class Webcam extends Component {
   state = {
     fps: 0,
     fpsArr: [],
-    blurMode: true,
+    mode: 'blur',
     wasmMode: false,
     info: null,
     infoTimeout: null,
@@ -68,7 +68,6 @@ class Webcam extends Component {
   }
 
   onMessage = ({ data }) => {
-    console.log(data);
     this.ctx.clearRect(0, 0, 400, 400);
     this.ctx.filter = 'none';
     this.ctx.drawImage(this.video, 0, 0);
@@ -93,10 +92,15 @@ class Webcam extends Component {
   }
 
   getAction = action => {
-    if (this.state.wasmMode) {
-      return this.state.blurMode ? 'findFaceWasm' : 'findEyesWasm';
+    const { wasmMode, mode } = this.state;
+    const language = wasmMode ? 'Wasm' : 'Js';
+    if (mode === 'rectangle' || mode === 'blur') {
+      return `findFace${language}`;
     }
-    return this.state.blurMode ? 'findFaceJs' : 'findEyesJs';
+    if (mode === 'glasses') {
+      return `findEyes${language}`;
+    }
+    return `${mode}${language}`;
   }
 
   getNextFrame = frame => {
@@ -111,6 +115,13 @@ class Webcam extends Component {
     this.setState({wasmMode: !this.state.wasmMode});
   }
 
+  runBenchmarks = () => {
+    if (this.state.loading || !this.props.serviceLoaded) {
+      return;
+    }
+    this.displayInfoLabel('Benchmarks not supported yet');
+  }
+
   render() {
     const err = (
       <div className="component-content">
@@ -123,29 +134,63 @@ class Webcam extends Component {
 
     const content = (
       <div className="component-content">
-        <Icon
-          name="face-active"
-          size="xxl"
-          onClick={() => this.setState({ blurMode: true })}
-          className={this.state.blurMode ? 'webcam-icon' : 'webcam-icon-inactive'}
-        />
+        <Label text={`fps: ${this.state.fps}`} className="fps-label" />
         <video ref={video => this.video = video } autoPlay={true} className="Webcam-video"/>
         <canvas ref={canvas => this.canvas = canvas} className="Webcam-canvas" width="600" height="400"/>
-        <Icon
-          name="glasses-active"
-          size="xxl"
-          onClick={() => this.setState({ blurMode: false })}
-          className={this.state.blurMode ? 'webcam-icon-inactive' : 'webcam-icon'}
-        />
         <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />
       </div>      
     );
 
+    const mode = this.state.mode;
+
     return (
       <div className="component-wrapper">
         <Header title="Webcam">
-          <Label text={`fps: ${this.state.fps}`} className="fps-label" />
+          <Label
+            text="Benchmark"
+            className="benchmark-label"
+            icon={<Icon name="benchmark" size="xs"/>}
+            onClick={this.runBenchmarks}
+            title="Run benchmark"
+          />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
+          <div className="toolbar">
+            <Label
+              icon={<Icon name="face-rect" size="s"/>}
+              size="square"
+              className={`toolbar-button ${mode === 'rectangle' ? 'active' : ''}`}
+              onClick={() => this.setState({ mode: 'rectangle' })}
+              title="Face Detection"
+            />
+            <Label
+              icon={<Icon name="face-blur" size="s"/>}
+              size="square"
+              className={`toolbar-button ${mode === 'blur' ? 'active' : ''}`}
+              onClick={() => this.setState({ mode: 'blur' })}
+              title="Face Blur"
+            />
+            <Label
+              icon={<Icon name="banana" size="s"/>}
+              size="square"
+              className={`toolbar-button ${mode === 'banana' ? 'active' : ''}`}
+              onClick={() => this.setState({ mode: 'banana' })}
+              title="Track bananas"
+            />
+            <Label
+              icon={<Icon name="smile" size="s"/>}
+              size="square"
+              className={`toolbar-button ${mode === 'smile' ? 'active' : ''}`}
+              onClick={() => this.setState({ mode: 'smile' })}
+              title="Smile for the camera"
+            />
+            <Label
+              icon={<Icon name="glasses-white" size="s"/>}
+              size="square"
+              className={`toolbar-button ${mode === 'glasses' ? 'active' : ''}`}
+              onClick={() => this.setState({ mode: 'glasses' })}
+              title="Glasses"
+            />
+          </div>
         </Header>
         { this.state.error ? err : content }
       </div>

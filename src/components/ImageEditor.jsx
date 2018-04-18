@@ -6,6 +6,7 @@ import Label from './Label';
 import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
+import Benchmark from './Benchmark';
 import { resizeImage } from '../utils/image';
 import ImageService from '../services/ImageService';
 
@@ -119,12 +120,25 @@ class ImageEditor extends Component {
     }
   }
 
-  runBenchmarks = () => {
-    if (this.state.loading || !this.props.serviceLoaded) {
+  onBenchmarkOpen = () => {
+    if (!this.props.serviceLoaded) {
       return;
     }
-    this.displayInfoLabel('Benchmarks not supported yet');
+    this.setState({ showBenchmark: true });
   }
+
+  onBenchmarkStart = () => {
+    this.setState({ info: 'Running benchmarks..', loading: true  });
+  }
+
+  onBenchmarkStop = () => {
+    this.dismissInfoLabel();
+    this.setState({ showBenchmark: true, loading: false });
+  }
+
+  onBenchmarkClose = () => {
+    this.setState({ showBenchmark: false });
+  };
 
   getAction = action => {
     return this.state.wasmMode ? `${action}Wasm` : `${action}Js`;
@@ -170,7 +184,7 @@ class ImageEditor extends Component {
             text="Benchmark"
             className="benchmark-label"
             icon={<Icon name="benchmark" size="xs"/>}
-            onClick={this.runBenchmarks}
+            onClick={this.onBenchmarkOpen}
             title="Run benchmark"
           />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
@@ -180,7 +194,7 @@ class ImageEditor extends Component {
               icon={<Icon name="restore" size="s"/>}
               size="square"
               className="toolbar-button"
-              onClick={(this.runRestore)}
+              onClick={this.runRestore}
               title="Restore image"
             />
             <Label
@@ -207,7 +221,15 @@ class ImageEditor extends Component {
           </div>
         </Header>
         <div className="component-content" ref={contentWrapper => this.contentWrapper = contentWrapper}>
-        <div className={`drop-info ${this.state.originalImage ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
+          <Benchmark
+            title="Image Editor"
+            benchmarkType="imageEditorBenchmark"
+            isOpen={this.state.showBenchmark}
+            onClose={this.onBenchmarkClose}
+            onStart={this.onBenchmarkStart}
+            onStop={this.onBenchmarkStop}
+          />
+          <div className={`drop-info ${this.state.originalImage ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
             <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />
             <span>Drop images here (or click to choose a file)</span>
             <input type="file" className="hidden" ref={(input) => this.input = input} onChange={this.onDrop} />

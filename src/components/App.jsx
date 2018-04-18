@@ -12,6 +12,7 @@ class App extends Component {
   state = {
     serviceLoaded: false,
     serviceError: null,
+    serviceLoadTime: null
   }
 
   async componentWillMount() {

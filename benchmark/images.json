@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "path": "data/001.png",
+      "faces": 0
+    },
+    {
+      "path": "data/002.png",
+      "faces": 1
+    }
+  ]
+}

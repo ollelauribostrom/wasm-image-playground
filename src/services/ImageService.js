@@ -20,6 +20,11 @@ class ImageService extends EventEmitter {
     if (message.data.loaded) {
       return this.emit('loaded', message);
     }
+    if (message.data.type === 'benchmarkUpdate' ||
+        message.data.type === 'benchmarkError' ||
+        message.data.type === 'benchmarkComplete') {
+      return this.emit(message.data.type, message);
+    }
     this.emit('message', message);
   }
 
