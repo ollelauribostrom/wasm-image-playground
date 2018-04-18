@@ -16,6 +16,13 @@ import sad from './sad.svg';
 import wasm from './wasm.png';
 import glassesActive from './glasses-active.svg';
 import faceActive from './face-active.svg';
+import banana from './banana.svg';
+import faceBlur from './face-blur.svg';
+import faceRect from './face-rect.svg';
+import glassesWhite from './glasses-white.svg';
+import smile from './smile.svg';
+import setup from './setup.svg';
+import results from './results.svg';
 
 export default {
   alert,
@@ -35,5 +42,12 @@ export default {
   wasm,
   'glasses-active': glassesActive,
   'face-active': faceActive,
-  'close-white': closeWhite
+  'close-white': closeWhite,
+  banana,
+  'face-blur': faceBlur,
+  'face-rect': faceRect,
+  'glasses-white': glassesWhite,
+  smile,
+  setup,
+  results
 };
