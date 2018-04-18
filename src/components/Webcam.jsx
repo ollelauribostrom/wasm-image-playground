@@ -5,77 +5,90 @@ import Label from './Label';
 import WasmMode from './WasmMode';
 import InfoLabel from './InfoLabel';
 import glasses from '../assets/glasses.svg';
-import ImageService from '../services/ImageService';
+import WebcamService from '../services/WebcamService';
 import { calcEyesPosition } from '../utils/image';
 
 class Webcam extends Component {
   state = {
-    fps: 0,
-    fpsArr: [],
     mode: 'blur',
     wasmMode: false,
     info: null,
     infoTimeout: null,
   }
 
-  async componentDidMount() {
-    ImageService.on('message', this.onMessage);
-    if (!this.props.serviceLoaded) {
-      return this.setState({ info: 'Loading OpenCv...' });
-    }
-    this.startCamera();
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.serviceLoaded && !prevProps.serviceLoaded) {
-      const message = this.props.serviceError || 'Finished loading OpenCv';
-      this.displayInfoLabel(message);
-      this.startCamera();
-    }
+  componentDidMount() {
+    this.webcamService = new WebcamService();
+    this.webcamService.on('wasm:message', this.onWasmMessage);
+    this.webcamService.on('js:message', this.onJsMessage);
+    this.webcamService.on('wasm:error', this.onError);
+    this.webcamService.on('js:error', this.onError);
+    this.webcamService.on('wasm:loaded', this.onLoad);
+    return this.setState({ info: 'Loading OpenCv...' });
   }
 
   componentWillUnmount() {
-    if (this.video.srcObject) {
-      this.video.srcObject.getTracks()[0].stop();
-    }
-    ImageService.removeListener('message', this.onMessage);
+    this.stopCamera();
+    this.webcamService.removeListener('wasm:message', this.onWasmMessage);
+    this.webcamService.removeListener('js:message', this.onJsMessage);
+    this.webcamService.removeListener('wasm:error', this.onError);
+    this.webcamService.removeListener('js:error', this.onError);
+    this.webcamService.removeListener('wasm:loaded', this.onLoad);
     window.clearTimeout(this.state.infoTimeout);
     window.cancelAnimationFrame(this.animationFrame);
   }
 
+  onWasmMessage = ({ data }) => {
+    const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    if (this.state.wasmMode) {
+      this.drawFrame(data);
+    }
+    this.getNextFrame(frame, 'wasm');
+  }
+
+  onJsMessage = ({ data }) => {
+    const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    if (!this.state.wasmMode) {
+      this.drawFrame(data);
+    }
+    this.getNextFrame(frame, 'js');
+  }
+
+  onLoad = () => {
+    this.displayInfoLabel('Finished loading OpenCv');
+    this.startCamera();
+  }
+
+  onError = ({ data }) => {
+    this.displayInfoLabel(data.error);
+    this.setState({ error: data.error});
+    this.stopCamera();
+  }
+
   startCamera = async () => {
     try {
-      if (this.props.serviceLoaded) {
-        const constraints = { audio: false, video: true };
-        this.video.srcObject = await window.navigator.mediaDevices.getUserMedia(constraints);
-        this.ctx = this.canvas.getContext('2d');
-        const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-        setTimeout(() => this.getNextFrame(frame), 1000);
-      }
+      const constraints = { audio: false, video: true };
+      this.video.srcObject = await window.navigator.mediaDevices.getUserMedia(constraints);
+      this.ctx = this.canvas.getContext('2d');
+      const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+      setTimeout(() => {
+        this.getNextFrame(frame, 'wasm');
+        this.getNextFrame(frame, 'js');
+      }, 1000);
     } catch (err) {
       this.setState({ error: 'No Webcam access' });
     }
   }
 
-  displayInfoLabel = info => {
-    const infoTimeout = window.setTimeout(this.dismissInfoLabel, 5000);
-    window.clearTimeout(this.state.infoTimeout);
-    this.setState({ info, infoTimeout });
+  stopCamera = () => {
+    if (this.video.srcObject) {
+      this.video.srcObject.getTracks()[0].stop();
+    }
   }
 
-  dismissInfoLabel = () => {
-    this.setState({ info: null })
-  }
-
-  onMessage = ({ data }) => {
+  drawFrame = (data) => {
     this.ctx.clearRect(0, 0, 400, 400);
     this.ctx.filter = 'none';
     this.ctx.drawImage(this.video, 0, 0);
-    const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
-    if (this.state.lastTimeUpdated) {
-      this.setState({ fps: Math.round(1000 / (data.time - this.state.lastTimeUpdated)) })
-    }
-    this.setState({ lastTimeUpdated: data.time })
     if (data.type === 'face') {
       this.ctx.filter = 'blur(10px)';
       for (let i = 0; i < data.face.length; i += 1) {
@@ -88,38 +101,29 @@ class Webcam extends Component {
       img.src = glasses;
       this.ctx.drawImage(img, x, y, width, height);
     }
-    this.getNextFrame(frame);
   }
 
-  getAction = action => {
-    const { wasmMode, mode } = this.state;
-    const language = wasmMode ? 'Wasm' : 'Js';
-    if (mode === 'rectangle' || mode === 'blur') {
-      return `findFace${language}`;
-    }
-    if (mode === 'glasses') {
-      return `findEyes${language}`;
-    }
-    return `${mode}${language}`;
-  }
-
-  getNextFrame = frame => {
-    ImageService.postMessage({
-      action: this.getAction(),
+  getNextFrame = (frame, type) => {
+    this.webcamService.postMessage({
+      action: this.state.mode,
+      type,
       frame,
     });
   }
 
-  toggleWasmMode = () => {
-    this.displayInfoLabel(`Now running ${!this.state.wasmMode ? 'WebAssembly' : 'JavaScript' }`)
-    this.setState({wasmMode: !this.state.wasmMode});
+  displayInfoLabel = info => {
+    const infoTimeout = window.setTimeout(this.dismissInfoLabel, 5000);
+    window.clearTimeout(this.state.infoTimeout);
+    this.setState({ info, infoTimeout });
   }
 
-  runBenchmarks = () => {
-    if (this.state.loading || !this.props.serviceLoaded) {
-      return;
-    }
-    this.displayInfoLabel('Benchmarks not supported yet');
+  dismissInfoLabel = () => {
+    this.setState({ info: null })
+  }
+
+  toggleWasmMode = () => {
+    this.displayInfoLabel(`Now running ${!this.state.wasmMode ? 'WebAssembly' : 'JavaScript' }`);
+    this.setState({wasmMode: !this.state.wasmMode});
   }
 
   render() {
@@ -134,7 +138,6 @@ class Webcam extends Component {
 
     const content = (
       <div className="component-content">
-        <Label text={`fps: ${this.state.fps}`} className="fps-label" />
         <video ref={video => this.video = video } autoPlay={true} className="Webcam-video"/>
         <canvas ref={canvas => this.canvas = canvas} className="Webcam-canvas" width="600" height="400"/>
         <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />
@@ -146,13 +149,6 @@ class Webcam extends Component {
     return (
       <div className="component-wrapper">
         <Header title="Webcam">
-          <Label
-            text="Benchmark"
-            className="benchmark-label"
-            icon={<Icon name="benchmark" size="xs"/>}
-            onClick={this.runBenchmarks}
-            title="Run benchmark"
-          />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
             <Label

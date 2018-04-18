@@ -9,7 +9,6 @@ import round from '../utils/round';
 let cv;
 let loadingCv;
 let faceCascade;
-let eyesCascade;
 
 onmessage = async ({ data }) => {
   const action = {
@@ -22,10 +21,6 @@ onmessage = async ({ data }) => {
     grayscaleJs,
     containsFaceWasm,
     containsFaceJs,
-    findFaceWasm,
-    findFaceJs,
-    findEyesWasm,
-    findEyesJs,
     imageEditorBenchmark,
     faceDetectorBenchmark
   }[data.action];
@@ -46,7 +41,6 @@ function init(data) {
         .then((instance) => {
           cv = instance;
           cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_default.xml', '../lib/data/haarcascade_frontalface_default.xml', true, false);
-          cv.FS_createPreloadedFile('/', 'haarcascade_eye.xml', '../lib/data/haarcascade_eye.xml', true, false);
           loadingCv = false;
           const time = performance.now() - start;
           console.log(`Finished loading OpenCv (${Math.round(time)}ms)`);
@@ -349,13 +343,6 @@ function loadFaceCascade() {
   }
 }
 
-function loadEyesCascade() {
-  if (eyesCascade === undefined) {
-    eyesCascade = new cv.CascadeClassifier();
-    eyesCascade.load('haarcascade_eye.xml');
-  }
-}
-
 function performFaceCount(config, fn) {
   const { result, time, error } = timed(fn, config);
   const { returnResult, language } = config;
@@ -410,94 +397,5 @@ function containsFaceJs({ images }, returnResult) {
       img.faceCount = faces.length;
       return img;
     });
-  });
-}
-
-function findFaceWasm({ frame }) {
-  loadFaceCascade();
-  const image = cv.matFromImageData(frame, 24);
-  const faces = new cv.RectVector();
-  const faceRects = [];
-  faceCascade.detectMultiScale(image, faces, 1.6, 3, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
-  for(let i = 0; i < faces.size(); i+= 1) {
-    faceRects.push(faces.get(i));
-  }
-  image.delete();
-  faces.delete();
-  postMessage({
-    face: faceRects,
-    language: 'WebAssembly',
-    type: 'face',
-    time: performance.now()
-  });
-}
-
-function findFaceJs({ frame }) {
-  const face = detect('face', frame, {
-    ratio: 1,
-    increment: 0.11,
-    baseScale: 2.0,
-    scaleInc: 1.6,
-    minNeighbors: 1,
-    doCannny: true,
-    cannyLow: 60,
-    cannyHigh: 200
-  });
-  postMessage({
-    face,
-    language: 'JS',
-    type: 'face',
-    time: performance.now()
-  });
-}
-
-function findEyesWasm({ frame }) {
-  loadFaceCascade();
-  loadEyesCascade();
-  const image = cv.matFromImageData(frame, 24);
-  const imageGray = new cv.Mat();
-  const faces = new cv.RectVector();
-  const eyesRect = [];
-  cv.cvtColor(image, imageGray, cv.COLOR_RGBA2GRAY, 0);
-  faceCascade.detectMultiScale(imageGray, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
-  for(let i = 0; i < faces.size(); i+= 1) {
-    const faceRect = faces.get(i)
-    const faceGray = imageGray.roi(faceRect);
-		const eyes = new cv.RectVector();
-		eyesCascade.detectMultiScale(faceGray, eyes, 1.6, 2, 0);
-		for (let j = 0; j < eyes.size(); j += 1) {
-      let eyeRect = eyes.get(j);
-			eyesRect.push({
-        x: faceRect.x + eyeRect.x,
-        y: faceRect.y + eyeRect.y,
-        width: eyeRect.width,
-        height: eyeRect.height
-      });
-		}
-		eyes.delete();
-  }
-  image.delete();
-  imageGray.delete();
-  faces.delete();
-  postMessage({
-    eyes: eyesRect,
-    language: 'WebAssembly',
-    type: 'eyes',
-    time: performance.now()
-  });
-}
-
-function findEyesJs({ frame }) {
-  const eyes = find('eye', frame.data, frame.width, frame.height, {
-    edgesDensity: 0.1,
-    initialScale: 4,
-    scaleFactor: 1.6,
-    stepSize: 2
-  });
-  postMessage({
-    eyes,
-    language: 'JS',
-    type: 'eyes',
-    time: performance.now()
   });
 }
