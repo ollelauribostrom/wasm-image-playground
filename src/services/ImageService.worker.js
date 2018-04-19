@@ -2,7 +2,7 @@ import { gaussianBlur, grayscale, boxBlur, find, detect} from 'imutils';
 import { diffSync } from 'uint8clampedarray-utils';
 import timed from '../utils/timed';
 import { imshowWrapper } from '../utils/image';
-import makeCv from '../../lib/opencv_js';
+import makeCv from '../../lib/opencv';
 import shortid from 'shortid';
 import round from '../utils/round';
 

@@ -1,4 +1,4 @@
-import makeCv from '../../lib/opencv_js';
+import makeCv from '../../lib/opencv';
 
 let cv;
 let loadingCv;
