@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
+import FpsCounter from 'fps';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
 import WasmMode from './WasmMode';
 import InfoLabel from './InfoLabel';
 import glasses from '../assets/glasses.svg';
+import shades from '../assets/shades.svg';
 import WebcamService from '../services/WebcamService';
-import { calcEyesPosition } from '../utils/image';
+import { calcEyesPosition, calcFacePosition } from '../utils/image';
+
+const shadesImg = new Image();
+const glassesImg = new Image();
+shadesImg.src = shades;
+glassesImg.src = glasses;
 
 class Webcam extends Component {
   state = {
@@ -14,10 +21,16 @@ class Webcam extends Component {
     wasmMode: false,
     info: null,
     infoTimeout: null,
+    wasmFps: 0,
+    jsFps: 0
   }
 
   componentDidMount() {
     this.webcamService = new WebcamService();
+    this.wasmFps = new FpsCounter({ every: 10 });
+    this.jsFps = new FpsCounter({ every: 10 });
+    this.wasmFps.on('data', wasmFps => this.setState({ wasmFps }));
+    this.jsFps.on('data', jsFps => this.setState({ jsFps }));
     this.webcamService.on('wasm:message', this.onWasmMessage);
     this.webcamService.on('js:message', this.onJsMessage);
     this.webcamService.on('wasm:error', this.onError);
@@ -39,18 +52,20 @@ class Webcam extends Component {
 
   onWasmMessage = ({ data }) => {
     const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    this.wasmFps.tick();
+    this.getNextFrame(frame, 'wasm');
     if (this.state.wasmMode) {
       this.drawFrame(data);
     }
-    this.getNextFrame(frame, 'wasm');
   }
 
   onJsMessage = ({ data }) => {
     const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+    this.jsFps.tick();
+    this.getNextFrame(frame, 'js');
     if (!this.state.wasmMode) {
       this.drawFrame(data);
     }
-    this.getNextFrame(frame, 'js');
   }
 
   onLoad = () => {
@@ -86,20 +101,31 @@ class Webcam extends Component {
   }
 
   drawFrame = (data) => {
-    this.ctx.clearRect(0, 0, 400, 400);
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.filter = 'none';
     this.ctx.drawImage(this.video, 0, 0);
-    if (data.type === 'face') {
+    const mode = this.state.mode;
+    if (mode === 'rectangle') {
+      const { x, y, width, height } = calcFacePosition(data.face);
+      this.ctx.beginPath();
+      this.ctx.strokeStyle = this.state.wasmMode ? '#633df8' : '#fecb00';
+      this.ctx.lineWidth = 2;
+      this.ctx.rect(x, y, width, height);
+      this.ctx.stroke();
+      this.ctx.closePath();
+    }
+    if (mode === 'blur') {
+      const { x, y, width, height } = calcFacePosition(data.face);
       this.ctx.filter = 'blur(10px)';
-      for (let i = 0; i < data.face.length; i += 1) {
-        const { x, y, height, width } = data.face[i];
-        this.ctx.drawImage(this.video, x, y, width, height, x, y, width, height);
-      }
-    } else if (data.type === 'eyes' && data.eyes.length) {
-      const { x, y, height, width } = calcEyesPosition(data.eyes);
-      const img = new Image();
-      img.src = glasses;
-      this.ctx.drawImage(img, x, y, width, height);
+      return this.ctx.drawImage(this.video, x, y, width, height, x, y, width, height);
+    } 
+    if (mode === 'glasses') {
+      const { x, y, width, height } = calcEyesPosition(data.eyes);
+      return this.ctx.drawImage(glassesImg, x, y, width, height);
+    }
+    if (mode === 'shades') {
+      const { x, y, width, height } = calcEyesPosition(data.eyes);
+      return this.ctx.drawImage(shadesImg, x, y, width, height);
     }
   }
 
@@ -141,13 +167,27 @@ class Webcam extends Component {
         <video ref={video => this.video = video } autoPlay={true} className="Webcam-video"/>
         <canvas ref={canvas => this.canvas = canvas} className="Webcam-canvas" width="600" height="400"/>
         <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />
+        <Label
+          icon={<Icon name="wasm" size="s"/>}
+          text={`fps: ${Math.round(this.state.wasmFps)}`}
+          size="medium"
+          className="fps wasm-fps"
+          title="WebAssembly FPS"
+        />
+        <Label
+          icon={<Icon name="js" size="s"/>}
+          text={`fps: ${Math.round(this.state.jsFps)}`}
+          size="medium"
+          className="fps js-fps"
+          title="JavaScript FPS"
+        />
       </div>      
     );
 
     const mode = this.state.mode;
 
     return (
-      <div className="component-wrapper">
+      <div className="component-wrapper webcam">
         <Header title="Webcam">
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
@@ -166,25 +206,18 @@ class Webcam extends Component {
               title="Face Blur"
             />
             <Label
-              icon={<Icon name="banana" size="s"/>}
-              size="square"
-              className={`toolbar-button ${mode === 'banana' ? 'active' : ''}`}
-              onClick={() => this.setState({ mode: 'banana' })}
-              title="Track bananas"
-            />
-            <Label
-              icon={<Icon name="smile" size="s"/>}
-              size="square"
-              className={`toolbar-button ${mode === 'smile' ? 'active' : ''}`}
-              onClick={() => this.setState({ mode: 'smile' })}
-              title="Smile for the camera"
-            />
-            <Label
-              icon={<Icon name="glasses-white" size="s"/>}
+              icon={<Icon name="glasses-white" size="xs"/>}
               size="square"
               className={`toolbar-button ${mode === 'glasses' ? 'active' : ''}`}
               onClick={() => this.setState({ mode: 'glasses' })}
               title="Glasses"
+            />
+            <Label
+              icon={<Icon name="shades-white" size="xs"/>}
+              size="square"
+              className={`toolbar-button ${mode === 'shades' ? 'active' : ''}`}
+              onClick={() => this.setState({ mode: 'shades' })}
+              title="Shades"
             />
           </div>
         </Header>

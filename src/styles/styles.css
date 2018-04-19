@@ -342,6 +342,11 @@ a {
   transition: 0.3s all;
 }
 
+.webcam .wasm-mode,
+.webcam .js-mode {
+  margin-left: 0;
+}
+
 .wasm-mode span,
 .js-mode span {
   margin-right: 5px;
@@ -506,6 +511,31 @@ a {
 .benchmark-result span {
   padding-left: 20px;
 }
+
+.fps {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  color: #5b5b5b;
+}
+
+.fps img {
+  margin-right: 10px;
+}
+
+.js-fps {
+  position: absolute;
+  top: 50px;
+  left: 10px;
+}
+
+.wasm-fps {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+}
+
 
 @media only screen 
 and (max-device-width : 1024px)  {

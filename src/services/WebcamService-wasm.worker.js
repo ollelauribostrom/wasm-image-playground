@@ -10,9 +10,8 @@ onmessage = async ({ data }) => {
     init,
     rectangle,
     blur,
-    banana,
-    smile,
-    glasses
+    glasses,
+    shades
   }[data.action];
 
   if (!action) {
@@ -74,12 +73,8 @@ function glasses({ frame }) {
   return findEyes(frame);
 }
 
-function banana({ frame }) {
-
-}
-
-function smile({ frame }) {
-
+function shades({ frame }) {
+  return findEyes(frame);
 }
 
 function findFace(frame) {
@@ -93,11 +88,7 @@ function findFace(frame) {
   }
   image.delete();
   faces.delete();
-  postMessage({
-    face: faceRects,
-    type: 'face',
-    time: performance.now()
-  });
+  postMessage({ face: faceRects });
 }
 
 function findEyes(frame) {
@@ -128,9 +119,5 @@ function findEyes(frame) {
   image.delete();
   imageGray.delete();
   faces.delete();
-  postMessage({
-    eyes: eyesRect,
-    type: 'eyes',
-    time: performance.now()
-  });
+  postMessage({ eyes: eyesRect });
 }

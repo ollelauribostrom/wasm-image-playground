@@ -23,6 +23,8 @@ import glassesWhite from './glasses-white.svg';
 import smile from './smile.svg';
 import setup from './setup.svg';
 import results from './results.svg';
+import shades from './shades.svg';
+import shadesWhite from './shades-white.svg';
 
 export default {
   alert,
@@ -49,5 +51,7 @@ export default {
   'glasses-white': glassesWhite,
   smile,
   setup,
-  results
+  results,
+  shades,
+  'shades-white': shadesWhite
 };

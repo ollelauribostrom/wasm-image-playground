@@ -4,9 +4,8 @@ onmessage = async ({ data }) => {
   const action = {
     rectangle,
     blur,
-    banana,
-    smile,
-    glasses
+    glasses,
+    shades
   }[data.action];
 
   if (!action) {
@@ -27,12 +26,8 @@ function glasses({ frame }) {
   return findEyes(frame);
 }
 
-function banana({ frame }) {
-
-}
-
-function smile({ frame }) {
-
+function shades({ frame }) {
+  return findEyes(frame);
 }
 
 function findFace(frame) {
@@ -46,23 +41,19 @@ function findFace(frame) {
     cannyLow: 60,
     cannyHigh: 200
   });
-  postMessage({
-    face,
-    type: 'face',
-    time: performance.now()
-  });
+  postMessage({ face });
 }
 
 function findEyes(frame) {
-  const eyes = find('eye', frame.data, frame.width, frame.height, {
-    edgesDensity: 0.1,
-    initialScale: 4,
-    scaleFactor: 1.6,
-    stepSize: 2
+  const eyes = detect('eye', frame, {
+    ratio: 1,
+    increment: 0.11,
+    baseScale: 2.0,
+    scaleInc: 1.6,
+    minNeighbors: 1,
+    doCannny: true,
+    cannyLow: 60,
+    cannyHigh: 200
   });
-  postMessage({
-    eyes,
-    type: 'eyes',
-    time: performance.now()
-  });
+  postMessage({ eyes });
 }
