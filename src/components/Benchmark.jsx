@@ -140,7 +140,7 @@ class Benchmark extends Component {
               /> : null
           }
           <Icon 
-            name="close-white"
+            name="close"
             size="l"
             onClick={this.props.onClose}
             className="benchmark-close-icon"

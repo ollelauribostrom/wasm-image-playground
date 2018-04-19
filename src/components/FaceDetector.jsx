@@ -164,7 +164,7 @@ class FaceDetector extends Component {
           <div className="toolbar">
             <Spinner visible={this.state.loading || !this.props.serviceLoaded} color="#A599FF" />
             <Label
-              icon={<Icon name="close-white" size="s"/>}
+              icon={<Icon name="close" size="s"/>}
               size="square"
               className="toolbar-button"
               onClick={() => this.setState({ images: [] })}

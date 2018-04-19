@@ -192,28 +192,28 @@ class Webcam extends Component {
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
             <Label
-              icon={<Icon name="face-rect" size="s"/>}
+              icon={<Icon name="faceRect" size="s"/>}
               size="square"
               className={`toolbar-button ${mode === 'rectangle' ? 'active' : ''}`}
               onClick={() => this.setState({ mode: 'rectangle' })}
               title="Face Detection"
             />
             <Label
-              icon={<Icon name="face-blur" size="s"/>}
+              icon={<Icon name="faceBlur" size="s"/>}
               size="square"
               className={`toolbar-button ${mode === 'blur' ? 'active' : ''}`}
               onClick={() => this.setState({ mode: 'blur' })}
               title="Face Blur"
             />
             <Label
-              icon={<Icon name="glasses-white" size="xs"/>}
+              icon={<Icon name="glassesWhite" size="xs"/>}
               size="square"
               className={`toolbar-button ${mode === 'glasses' ? 'active' : ''}`}
               onClick={() => this.setState({ mode: 'glasses' })}
               title="Glasses"
             />
             <Label
-              icon={<Icon name="shades-white" size="xs"/>}
+              icon={<Icon name="shadesWhite" size="xs"/>}
               size="square"
               className={`toolbar-button ${mode === 'shades' ? 'active' : ''}`}
               onClick={() => this.setState({ mode: 'shades' })}
