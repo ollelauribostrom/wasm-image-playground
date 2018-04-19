@@ -40,7 +40,7 @@ function init(data) {
       makeCv()
         .then((instance) => {
           cv = instance;
-          cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_default.xml', '../lib/data/haarcascade_frontalface_default.xml', true, false);
+          cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_alt.xml', '../lib/data/haarcascade_frontalface_alt.xml', true, false);
           loadingCv = false;
           const time = performance.now() - start;
           console.log(`Finished loading OpenCv (${Math.round(time)}ms)`);
@@ -339,7 +339,7 @@ function boxBlurJs({ img }, returnResult) {
 function loadFaceCascade() {
   if (faceCascade === undefined) {
     faceCascade = new cv.CascadeClassifier();
-    faceCascade.load('haarcascade_frontalface_default.xml');
+    faceCascade.load('haarcascade_frontalface_alt.xml');
   }
 }
 

@@ -29,7 +29,7 @@ function init(data) {
       makeCv()
         .then((instance) => {
           cv = instance;
-          cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_default.xml', '../lib/data/haarcascade_frontalface_default.xml', true, false);
+          cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_alt.xml', '../lib/data/haarcascade_frontalface_alt.xml', true, false);
           cv.FS_createPreloadedFile('/', 'haarcascade_eye.xml', '../lib/data/haarcascade_eye.xml', true, false);
           loadingCv = false;
           const time = performance.now() - start;
@@ -50,7 +50,7 @@ function init(data) {
 function loadFaceCascade() {
   if (faceCascade === undefined) {
     faceCascade = new cv.CascadeClassifier();
-    faceCascade.load('haarcascade_frontalface_default.xml');
+    faceCascade.load('haarcascade_frontalface_alt.xml');
   }
 }
 
