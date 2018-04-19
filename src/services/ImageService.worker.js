@@ -1,4 +1,4 @@
-import { gaussianBlur, grayscale, boxBlur, find, detect} from 'imutils';
+import { gaussianBlur, grayscale, boxBlur, detect } from 'imutils';
 import { diffSync } from 'uint8clampedarray-utils';
 import timed from '../utils/timed';
 import { imshowWrapper } from '../utils/image';
@@ -388,11 +388,15 @@ function containsFaceJs({ images }, returnResult) {
     returnResult
   }, () => {
     return images.map(img => {
-      const faces = find('face', img.data.data, img.data.width, img.data.height, {
-        edgesDensity: 0.1,
-        initialScale: 4,
-        scaleFactor: 1.25,
-        stepSize: 2
+      const faces = detect('face', img.data, {
+        ratio: 1,
+        increment: 0.11,
+        baseScale: 1.0,
+        scaleInc: 1.6,
+        minNeighbors: 1,
+        doCannny: true,
+        cannyLow: 60,
+        cannyHigh: 200
       });
       img.faceCount = faces.length;
       return img;

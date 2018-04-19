@@ -1,4 +1,4 @@
-import { find, detect} from 'imutils';
+import { detect } from 'imutils';
 
 onmessage = async ({ data }) => {
   const action = {
