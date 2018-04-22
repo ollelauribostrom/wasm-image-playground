@@ -8,7 +8,8 @@ import InfoLabel from './InfoLabel';
 import glasses from '../assets/glasses.svg';
 import shades from '../assets/shades.svg';
 import WebcamService from '../services/WebcamService';
-import { calcEyesPosition, calcFacePosition } from '../utils/image';
+import { calcEyesPosition } from '../utils/eyes';
+import { calcFacePosition } from '../utils/face';
 
 const shadesImg = new Image();
 const glassesImg = new Image();

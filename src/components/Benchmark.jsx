@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
+import { imageConverters } from 'imutils';
 import Icon from './Icon';
 import BenchmarkTask from './BenchmarkTask';
 import BenchmarkResult from './BenchmarkResult';
 import ImageService from '../services/ImageService';
 import Label from './Label';
 import benchmarkImages from '../../benchmark/images.json'
-import { imageToUint8ClampedArray } from '../utils/image';
 
 class Benchmark extends Component {
   state = {
@@ -57,7 +57,7 @@ class Benchmark extends Component {
       const images = await Promise.all(benchmarkImages.files.map(async image => {
         const res = await fetch(require(`../../benchmark/${image.path}`));
         const blob = await res.blob();
-        const data = await imageToUint8ClampedArray(URL.createObjectURL(blob));
+        const data = await imageConverters.toUint8ClampedArray(URL.createObjectURL(blob));
         return { data, faces: image.faces }
       }));
       this.addOrUpdateTask({
@@ -113,20 +113,22 @@ class Benchmark extends Component {
   }
 
   render() {
+    const modalStyle = {
+      content: {
+        background: "transparent",
+        border: 0
+      },
+      overlay: {
+        background: "rgba(0, 0, 0, 0.9)",
+        border: 0,
+        zIndex: 2,            
+      }
+    };
+    
     return (
       <Modal
         isOpen={this.props.isOpen}
-        style={{
-          content: {
-            background: "transparent",
-            border: 0
-          },
-          overlay: {
-            background: "rgba(0, 0, 0, 0.9)",
-            border: 0,
-            zIndex: 2,            
-          }
-        }}
+        style={modalStyle}
       >
         <div className="benchmark-content">
           <h1 className="benchmark-heading">Benchmark: {this.props.title}</h1>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { isImage } from 'imutils';
+import { isImage, scaleToFit } from 'imutils';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
@@ -7,7 +7,6 @@ import WasmMode from './WasmMode';
 import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import Benchmark from './Benchmark';
-import { resizeImage } from '../utils/image';
 import ImageService from '../services/ImageService';
 
 class ImageEditor extends Component {
@@ -165,7 +164,7 @@ class ImageEditor extends Component {
     reader.onload = () => img.src = reader.result;
     img.onload = () => {
       if (!onResize) {
-        resizeImage(img, this.canvas.width, this.canvas.height);
+        scaleToFit(img, this.canvas.width, this.canvas.height);
       }
       const offsetWidth = (this.canvas.width / 2) - (img.width / 2);
       const offsetHeight = (this.canvas.height / 2) - (img.height / 2);

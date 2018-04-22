@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { asyncImageListLoader } from 'imutils';
+import { imageListLoader, imageConverters, arrayConverters } from 'imutils';
 import Header from './Header';
 import Icon from './Icon';
 import Label from './Label';
@@ -8,7 +8,6 @@ import Spinner from './Spinner';
 import InfoLabel from './InfoLabel';
 import Benchmark from './Benchmark';
 import ImageService from '../services/ImageService';
-import { imagesToUint8ClampedArray, Uint8ClampedArrayToImage } from '../utils/image';
 
 class FaceDetector extends Component {
   state = {
@@ -49,7 +48,7 @@ class FaceDetector extends Component {
   onMessage = ({ data }) => {
     if (data.result) {
       const images = data.result.map(({ data, ...props }) => ({
-        data: Uint8ClampedArrayToImage(data),
+        data: arrayConverters.toImage(data),
         ...props
       }))
       this.setState({ images });
@@ -74,7 +73,7 @@ class FaceDetector extends Component {
   }
 
   loadImages = async fileList => {
-    const newImages = await asyncImageListLoader(fileList, () => {
+    const newImages = await imageListLoader(fileList, () => {
       this.displayInfoLabel('File is not an image, skipping')
     })
     const images = [...this.state.images, ...newImages];
@@ -107,12 +106,12 @@ class FaceDetector extends Component {
   }
 
   onBenchmarkStart = () => {
-    this.setState({ info: 'Running benchmarks..'  });
+    this.setState({ info: 'Running benchmarks..', loading: true  });
   }
 
   onBenchmarkStop = () => {
     this.dismissInfoLabel();
-    this.setState({ showBenchmark: true });
+    this.setState({ showBenchmark: true, loading: false });
   }
 
   onBenchmarkClose = () => {
@@ -125,7 +124,7 @@ class FaceDetector extends Component {
     }
     if (this.state.images.length) {
       this.setState({ loading: true });
-      const images = await imagesToUint8ClampedArray([...this.state.images]);
+      const images = await imageConverters.mapToUint8ClampedArray([...this.state.images]);
       ImageService.postMessage({
         action: this.state.wasmMode? 'containsFaceWasm' : 'containsFaceJs',
         images

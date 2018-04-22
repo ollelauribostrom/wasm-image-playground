@@ -1,10 +1,9 @@
-import { gaussianBlur, grayscale, boxBlur, detect } from 'imutils';
+import shortid from 'shortid';
+import round from 'lodash.round';
+import { gaussianBlur, grayscale, boxBlur, detect, matConverters } from 'imutils';
 import { diffSync } from 'uint8clampedarray-utils';
 import timed from '../utils/timed';
-import { imshowWrapper } from '../utils/image';
 import makeCv from '../../lib/opencv';
-import shortid from 'shortid';
-import round from '../utils/round';
 
 let cv;
 let loadingCv;
@@ -268,7 +267,7 @@ function gaussianBlurWasm({ img }, returnResult) {
     const size = new cv.Size(9, 9);
     cv.GaussianBlur(image, output, size, 0, 0, cv.BORDER_DEFAULT);
     image.delete();
-    return imshowWrapper(output, cv);
+    return matConverters.toImageData(output, cv);
   });
 }
 
@@ -292,7 +291,7 @@ function grayscaleWasm({ img }, returnResult) {
     const output = new cv.Mat();
     cv.cvtColor(image, output, cv.COLOR_RGBA2GRAY, 4);
     image.delete();
-    return imshowWrapper(output, cv);
+    return matConverters.toImageData(output, cv);
   });
 }
 
@@ -322,7 +321,7 @@ function boxBlurWasm({ img }, returnResult) {
     const output = new cv.Mat();
     cv.blur(image, output, size);
     image.delete();
-    return imshowWrapper(output, cv);
+    return matConverters.toImageData(output, cv);
   });  
 }
 
@@ -390,13 +389,11 @@ function containsFaceJs({ images }, returnResult) {
     return images.map(img => {
       const faces = detect('face', img.data, {
         ratio: 1,
-        increment: 0.11,
+        increment: 0.05,
         baseScale: 1.0,
-        scaleInc: 1.6,
-        minNeighbors: 1,
+        scaleInc: 1.5,
+        minNeighbors: 2,
         doCannny: true,
-        cannyLow: 60,
-        cannyHigh: 200
       });
       img.faceCount = faces.length;
       return img;
