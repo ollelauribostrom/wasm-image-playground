@@ -345,11 +345,9 @@ function loadFaceCascade() {
 function performFaceCount(config, fn) {
   const { result, time, error } = timed(fn, config);
   const { returnResult, language } = config;
-  const images = result.filter(img => img.faceCount > 0).length;
   const faces = result.reduce((count, img) => count + img.faceCount, 0);
   const faceNoun = faces === 1 ? 'face' : 'faces';
-  const imageNoun = images === 1 ? 'image' : 'images';
-  const info = `Found ${faces} ${faceNoun} in ${images} ${imageNoun}`;
+  const info = `Found ${faces} ${faceNoun}`;
   if (returnResult) {
     return { result, time, error };
   }
