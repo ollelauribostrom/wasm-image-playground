@@ -80,6 +80,13 @@ class FaceDetector extends Component {
     this.setState({ images, loading: false })
   }
 
+  clearImages = () => {
+    if (this.state.loading) {
+      return;
+    }
+    this.setState({ images: [] })
+  }
+
   toggleWasmMode = () => {
     if (this.state.loading) {
       return;
@@ -166,7 +173,7 @@ class FaceDetector extends Component {
               icon={<Icon name="close" size="s"/>}
               size="square"
               className="toolbar-button"
-              onClick={() => this.setState({ images: [] })}
+              onClick={this.clearImages}
               title="Clear uploaded images"
             />
             <Label
