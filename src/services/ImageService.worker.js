@@ -289,7 +289,7 @@ function grayscaleWasm({ img }, returnResult) {
   }, () => {
     const image = cv.matFromImageData(img);
     const output = new cv.Mat();
-    cv.cvtColor(image, output, cv.COLOR_RGBA2GRAY, 4);
+    cv.cvtColor(image, output, cv.COLOR_RGBA2GRAY);
     image.delete();
     return matConverters.toImageData(output, cv);
   });
@@ -368,10 +368,10 @@ function containsFaceWasm({ images }, returnResult) {
     returnResult
   }, () => {
     return images.map(img => {
-      const image = cv.matFromImageData(img.data);
+      const image = cv.matFromImageData(img.data, 24);
       const faces = new cv.RectVector();
       cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY);
-      faceCascade.detectMultiScale(image, faces, 1.5, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
+      faceCascade.detectMultiScale(image, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE);
       img.faceCount = faces.size();
       image.delete();
       faces.delete();
@@ -389,11 +389,11 @@ function containsFaceJs({ images }, returnResult) {
     return images.map(img => {
       const faces = detect('face', img.data, {
         ratio: 1,
-        increment: 0.05,
+        increment: 0.12,
         baseScale: 1.0,
-        scaleInc: 1.5,
+        scaleInc: 1.6,
         minNeighbors: 2,
-        doCannny: true,
+        doCanny: false
       });
       img.faceCount = faces.length;
       return img;
