@@ -3581,6 +3581,12 @@ imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
 
+imutils@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/imutils/-/imutils-1.0.1.tgz#8daf36d78ced8c60f8948c7b4b235e62f2bb773e"
+  dependencies:
+    shortid "^2.2.8"
+
 indent-string@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/indent-string/-/indent-string-2.1.0.tgz#8e2d48348742121b4a8218b7a137e9a52049dc80"

@@ -22,7 +22,7 @@ module.exports = env => {
       // Workers loader
       {
         test: /\.worker\.js$/,
-        loader: 'worker-loader'
+        use: { loader: 'worker-loader' }
       },
       // EsLint
       {
