@@ -265,7 +265,7 @@ function gaussianBlurWasm({ img }, returnResult) {
     const image = cv.matFromImageData(img);
     const output = new cv.Mat();
     const size = new cv.Size(9, 9);
-    cv.GaussianBlur(image, output, size, 0, 0, cv.BORDER_DEFAULT);
+    cv.GaussianBlur(image, output, size, 1.65, 0, cv.BORDER_DEFAULT);
     image.delete();
     return matConverters.toImageData(output, cv);
   });
