@@ -42,7 +42,7 @@ function init(data) {
           cv.FS_createPreloadedFile('/', 'haarcascade_frontalface_alt.xml', '../lib/data/haarcascade_frontalface_alt.xml', true, false);
           loadingCv = false;
           const time = performance.now() - start;
-          console.log(`Finished loading OpenCv (${Math.round(time)}ms)`);
+          console.log(`Finished loading OpenCv (${round(time, 2)}ms)`);
           postMessage({ loaded: true, time });
         })
         .catch((error) => {
@@ -182,7 +182,7 @@ function performDetectionTask({ info, type, images, fn }) {
   });
   try {
     const result = fn({ images }, true);
-    const time = Math.round(result.time);
+    const time = round(result.time, 2);
     const expectedFaces = images.reduce((total, img) => total + img.faces, 0);
     const foundFaces = result.result.reduce((total, r) => total + r.faceCount, 0);
     const falsePositives = findFalsePositives(result.result, images);
@@ -221,8 +221,8 @@ function performTask({ info, type, images, fn }) {
         throw result.err;
       }
     }
-    const time = Math.round(results.reduce((total, r) => total + r.time, 0));
-    const average = Math.round(time / images.length);
+    const time = round(results.reduce((total, r) => total + r.time, 0), 2);
+    const average = round(time / images.length, 2);
     postMessage({
       type: 'benchmarkUpdate',
       task: {
@@ -251,7 +251,7 @@ function performAction(config, fn) {
   }
   postMessage({
     result,
-    info: error || `${config.info} in ${Math.round(time)}ms`,
+    info: error || `${config.info} in ${round(time)}ms`,
     time
   });
 }
@@ -355,7 +355,7 @@ function performFaceCount(config, fn) {
   }
   postMessage({
     result,
-    info: error || `${language}: ${info} - ${Math.round(time)}ms`,
+    info: error || `${language}: ${info} - ${round(time)}ms`,
     time
   });
 }
