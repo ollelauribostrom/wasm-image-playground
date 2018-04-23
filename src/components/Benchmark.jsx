@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
-import Modal from 'react-modal';
 import { imageConverters } from 'imutils';
-import Icon from './Icon';
-import BenchmarkTask from './BenchmarkTask';
-import BenchmarkResult from './BenchmarkResult';
+import BenchmarkModal from './BenchmarkModal';
 import ImageService from '../services/ImageService';
-import Label from './Label';
 import benchmarkImages from '../../benchmark/images.json'
 
 class Benchmark extends Component {
@@ -113,57 +109,17 @@ class Benchmark extends Component {
   }
 
   render() {
-    const modalStyle = {
-      content: {
-        background: "transparent",
-        border: 0
-      },
-      overlay: {
-        background: "rgba(0, 0, 0, 0.9)",
-        border: 0,
-        zIndex: 2,            
-      }
-    };
-    
     return (
-      <Modal
+      <BenchmarkModal
         isOpen={this.props.isOpen}
-        style={modalStyle}
-      >
-        <div className="benchmark-content">
-          <h1 className="benchmark-heading">Benchmark: {this.props.title}</h1>
-          {
-            !this.state.running && this.state.results.length ?
-              <Icon 
-                name="restore"
-                size="l"
-                onClick={this.restart}
-                className="benchmark-reset-icon"
-              /> : null
-          }
-          <Icon 
-            name="close"
-            size="l"
-            onClick={this.props.onClose}
-            className="benchmark-close-icon"
-          />
-          { !this.state.running && !this.state.results.length ? 
-              <Label 
-                text="Run Benchmark"
-                size="large"
-                onClick={this.start}
-                className="benchmark-button" 
-              /> : null
-          }
-          {this.state.tasks.map(task => <BenchmarkTask {...task} />)}
-          {
-            this.state.results.length ?
-              <div className="benchmark-results">
-                {this.state.results.map(result => <BenchmarkResult {...result} />)}
-              </div> : null
-          }
-        </div>
-      </Modal>
+        running={this.state.running}
+        tasks={this.state.tasks}
+        results={this.state.results}
+        title={this.props.title}
+        onStart={this.start}
+        onRestart={this.restart}
+        onClose={this.props.onClose}
+      />
     )
   }
 }

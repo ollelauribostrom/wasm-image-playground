@@ -38,7 +38,7 @@ a {
 
 /* States */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* App component */
@@ -325,11 +325,6 @@ a {
 .js-mode {
   margin-left: 25px;
   transition: 0.3s all;
-}
-
-.webcam .wasm-mode,
-.webcam .js-mode {
-  margin-left: 0;
 }
 
 .wasm-mode span,
