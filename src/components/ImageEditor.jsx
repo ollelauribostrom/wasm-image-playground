@@ -79,7 +79,7 @@ class ImageEditor extends Component {
       this.setState({ originalImage: file, loading: true });
       this.drawImage(file);
     } else {
-      this.displayInfoLabel('The dropped file is not an image');
+      this.displayInfoLabel('The uploaded file is not an image');
     }
   }
 
