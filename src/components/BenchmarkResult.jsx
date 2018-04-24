@@ -1,9 +1,9 @@
 import React from 'react';
 import Icon from './Icon';
 
-function BenchmarkResult({ task, fastest, percent, avgDiff }) {
+function BenchmarkResult({ task, taskInfo, fastest, percent, avgDiff }) {
   const diff = avgDiff !== undefined ? `(${avgDiff}% difference in output pixels)` : '';
-  const info = `${task}: ${fastest} was ${percent.total}% faster ${diff}`;
+  const info = taskInfo || `${task}: ${fastest} was ${percent.total}% faster ${diff}`;
   return (
     <div className="benchmark-result" key={task}>
       {<Icon name="results" size="s" />}
