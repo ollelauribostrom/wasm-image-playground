@@ -67,6 +67,13 @@
     "name": "wasm-image-playground",
     "alias": "wasm-image-playground.now.sh",
     "public": true,
-    "type": "static"
+    "type": "static",
+    "files": [
+      "dist",
+      "lib",
+      "favicon.ico",
+      "index.html",
+      "manifest.json"
+    ]
   }
 }
