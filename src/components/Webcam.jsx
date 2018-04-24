@@ -5,25 +5,33 @@ import Icon from './Icon';
 import Label from './Label';
 import WasmMode from './WasmMode';
 import InfoLabel from './InfoLabel';
+import BenchmarkModal from './BenchmarkModal';
 import glasses from '../assets/glasses.svg';
 import shades from '../assets/shades.svg';
 import WebcamService from '../services/WebcamService';
+import BenchmarkTracker from '../utils/BenchmarkTracker';
 import { calcEyesPosition } from '../utils/eyes';
 import { calcFacePosition } from '../utils/face';
 
-const shadesImg = new Image();
+const wasmBenchmark = new BenchmarkTracker();
+const jsBenchmark = new BenchmarkTracker();
 const glassesImg = new Image();
-shadesImg.src = shades;
+const shadesImg = new Image();
 glassesImg.src = glasses;
+shadesImg.src = shades;
 
 class Webcam extends Component {
   state = {
-    mode: 'blur',
+    mode: 'rectangle',
     wasmMode: false,
     info: null,
     infoTimeout: null,
     wasmFps: 0,
-    jsFps: 0
+    jsFps: 0,
+    benchmarkRunning: false,
+    benchmarkOpen: false,
+    benchmarkTasks: [],
+    benchmarkResults: []
   }
 
   componentDidMount() {
@@ -37,7 +45,7 @@ class Webcam extends Component {
     this.webcamService.on('wasm:error', this.onError);
     this.webcamService.on('js:error', this.onError);
     this.webcamService.on('wasm:loaded', this.onLoad);
-    return this.setState({ info: 'Loading OpenCv...' });
+    this.setState({ info: 'Loading OpenCv...' });
   }
 
   componentWillUnmount() {
@@ -52,24 +60,28 @@ class Webcam extends Component {
   }
 
   onWasmMessage = ({ data }) => {
-    const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     this.wasmFps.tick();
-    this.getNextFrame(frame, 'wasm');
-    if (this.state.wasmMode) {
-      this.drawFrame(data);
+    if (this.state.benchmarkRunning) {
+      const detection = data.eyes || data.face;
+      wasmBenchmark.tick(detection.length);
     }
+    this.getNextFrame('wasm');
+    this.drawFrame(data, 'wasm');
+
   }
 
   onJsMessage = ({ data }) => {
-    const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     this.jsFps.tick();
-    this.getNextFrame(frame, 'js');
-    if (!this.state.wasmMode) {
-      this.drawFrame(data);
+    if (this.state.benchmarkRunning) {
+      const detection = data.eyes || data.face;
+      jsBenchmark.tick(detection.length);
     }
+    this.getNextFrame('js');
+    this.drawFrame(data, 'js');
   }
 
   onLoad = () => {
+    this.setState({ openCvLoaded: true });
     this.displayInfoLabel('Finished loading OpenCv');
     this.startCamera();
   }
@@ -84,11 +96,12 @@ class Webcam extends Component {
     try {
       const constraints = { audio: false, video: true };
       this.video.srcObject = await window.navigator.mediaDevices.getUserMedia(constraints);
-      this.ctx = this.canvas.getContext('2d');
-      const frame = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
+      this.wasmCtx = this.wasmcanvas.getContext('2d');
+      this.jsCtx = this.jscanvas.getContext('2d');
+      this.bufferCtx = this.buffer.getContext('2d');
       setTimeout(() => {
-        this.getNextFrame(frame, 'wasm');
-        this.getNextFrame(frame, 'js');
+        this.getNextFrame('wasm');
+        this.getNextFrame('js');
       }, 1000);
     } catch (err) {
       this.setState({ error: 'No Webcam access' });
@@ -101,40 +114,113 @@ class Webcam extends Component {
     }
   }
 
+  openBenchmark = () => {
+    if (!this.state.openCvLoaded) {
+      return;
+    }
+    this.setState({ benchmarkOpen: true });
+  }
+
+  runBenchmark = () => {
+    if (this.state.benchmarkRunning) {
+      return;
+    }
+    window.setTimeout(() => {
+      window.clearTimeout(this.state.infoTimeout);
+      wasmBenchmark.reset();
+      jsBenchmark.reset();
+      this.benchmarkTask({ id: 'rect', status: 'running', info: 'Detecting face', type: 'faceRect' });
+      this.setState({
+        benchmarkRunning: true,
+        benchmarkResults: [],
+        mode: 'rectangle',
+        info: 'Running benchmark'
+      })
+    }, 0);
+    window.setTimeout(() => {
+      this.benchmarkTask({ id: 'rect', status: 'done' });
+      this.benchmarkTask({ id: 'blur', status: 'running', info: 'Blurring face', type: 'faceBlur' });
+      this.setState({ mode: 'blur' });
+    }, 15000);
+    window.setTimeout(() => {
+      this.benchmarkTask({ id: 'blur', status: 'done' });
+      this.benchmarkTask({ id: 'glasses', status: 'running', info: 'Drawing glasses', type: 'glassesWhite', iconSize: 'xs' });
+      this.setState({ mode: 'glasses' });
+    }, 30000);
+    window.setTimeout(() => {
+      this.benchmarkTask({ id: 'glasses', status: 'done' });
+      this.benchmarkTask({ id: 'shades', status: 'running', info: 'Drawing shades', type: 'shadesWhite', iconSize: 'xs' });
+      this.setState({ mode: 'shades' });
+    }, 45000);
+    window.setTimeout(() => {
+      this.benchmarkTask({ id: 'shades', status: 'done' });
+      this.stopBenchmark();
+    }, 60000);
+  }
+
+  benchmarkTask = task => {
+    const benchmarkTasks = [...this.state.benchmarkTasks];
+    const taskIndex = benchmarkTasks.findIndex(t => t.id === task.id);
+    if (taskIndex > -1) {
+      benchmarkTasks[taskIndex] = Object.assign(benchmarkTasks[taskIndex], task);
+    } else {
+      benchmarkTasks.push(task)
+    }
+    this.setState({ benchmarkTasks });
+  }
+
+  stopBenchmark = () => {
+    const wasmResult = wasmBenchmark.getResult(60);
+    const jsResult = jsBenchmark.getResult(60);
+    this.setState({
+      benchmarkOpen: true,
+      benchmarkRunning: false,
+      benchmarkResults: [
+        { task: 'wasm', taskInfo: `WebAssembly: ${wasmResult.info}` },
+        { task: 'js', taskInfo: `JavaScript: ${jsResult.info}` }
+      ],
+      info: null,
+    });
+  }
+
   drawFrame = (data) => {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.filter = 'none';
-    this.ctx.drawImage(this.video, 0, 0);
+    const canvas = this.state.wasmMode ? this.wasmcanvas : this.jscanvas;
+    const ctx = this.state.wasmMode ? this.wasmCtx : this.jsCtx;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.filter = 'none';
+    ctx.drawImage(this.video, 0, 0);
     const mode = this.state.mode;
     if (mode === 'rectangle') {
       const { x, y, width, height } = calcFacePosition(data.face);
-      this.ctx.beginPath();
-      this.ctx.strokeStyle = this.state.wasmMode ? '#633df8' : '#fecb00';
-      this.ctx.lineWidth = 2;
-      this.ctx.rect(x, y, width, height);
-      this.ctx.stroke();
-      this.ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = this.state.wasmMode ? '#633df8' : '#fecb00';
+      ctx.lineWidth = 2;
+      ctx.rect(x, y, width, height);
+      ctx.stroke();
+      return ctx.closePath();
     }
     if (mode === 'blur') {
       const { x, y, width, height } = calcFacePosition(data.face);
-      this.ctx.filter = 'blur(10px)';
-      return this.ctx.drawImage(this.video, x, y, width, height, x, y, width, height);
-    } 
+      ctx.filter = 'blur(10px)';
+      return ctx.drawImage(this.video, x, y, width, height, x, y, width, height);
+    }
     if (mode === 'glasses') {
       const { x, y, width, height } = calcEyesPosition(data.eyes);
-      return this.ctx.drawImage(glassesImg, x, y, width, height);
+      return ctx.drawImage(glassesImg, x, y, width, height);
     }
     if (mode === 'shades') {
       const { x, y, width, height } = calcEyesPosition(data.eyes);
-      return this.ctx.drawImage(shadesImg, x, y, width, height);
+      return ctx.drawImage(shadesImg, x, y, width, height);
     }
   }
 
-  getNextFrame = (frame, type) => {
+  getNextFrame = type => {
+    this.bufferCtx.clearRect(0, 0, this.buffer.width, this.buffer.height);
+    this.bufferCtx.drawImage(this.video, 0, 0);
     this.webcamService.postMessage({
       action: this.state.mode,
       type,
-      frame,
+      frame: this.bufferCtx.getImageData(0, 0, this.buffer.width, this.buffer.height)
     });
   }
 
@@ -149,8 +235,15 @@ class Webcam extends Component {
   }
 
   toggleWasmMode = () => {
-    this.displayInfoLabel(`Now running ${!this.state.wasmMode ? 'WebAssembly' : 'JavaScript' }`);
+    this.displayInfoLabel(`Now displaying ${!this.state.wasmMode ? 'WebAssembly' : 'JavaScript' } canvas`);
     this.setState({wasmMode: !this.state.wasmMode});
+  }
+
+  setMode = mode => {
+    if (this.state.benchmarkRunning) {
+      return;
+    }
+    this.setState({ mode });
   }
 
   render() {
@@ -166,7 +259,25 @@ class Webcam extends Component {
     const content = (
       <div className="component-content">
         <video ref={video => this.video = video } autoPlay={true} className="Webcam-video"/>
-        <canvas ref={canvas => this.canvas = canvas} className="Webcam-canvas" width="600" height="400"/>
+        <canvas 
+          ref={canvas => this.wasmcanvas = canvas} 
+          className="Webcam-canvas"
+          style={{
+            display: this.state.wasmMode ? 'flex' : 'none'
+          }}
+          width="600" 
+          height="400"
+        />
+        <canvas 
+          ref={canvas => this.jscanvas = canvas} 
+          className="Webcam-canvas"
+          style={{
+            display: !this.state.wasmMode ? 'flex' : 'none'
+          }}
+          width="600" 
+          height="400"
+        />
+        <canvas ref={buffer => this.buffer = buffer} className="hidden" width="600" height="400"/>
         <InfoLabel text={this.state.info} onClick={this.dismissInfoLabel} />
         <Label
           icon={<Icon name="wasm" size="s"/>}
@@ -190,39 +301,56 @@ class Webcam extends Component {
     return (
       <div className="component-wrapper webcam">
         <Header title="Webcam">
+          <Label
+            text="Benchmark"
+            className="benchmark-label"
+            icon={<Icon name="benchmark" size="xs"/>}
+            onClick={this.openBenchmark}
+            title="Run benchmark"
+          />
           <WasmMode wasmMode={this.state.wasmMode} onClick={this.toggleWasmMode} />
           <div className="toolbar">
             <Label
               icon={<Icon name="faceRect" size="s"/>}
               size="square"
               className={`toolbar-button ${mode === 'rectangle' ? 'active' : ''}`}
-              onClick={() => this.setState({ mode: 'rectangle' })}
+              onClick={() => this.setMode('rectangle')}
               title="Face Detection"
             />
             <Label
               icon={<Icon name="faceBlur" size="s"/>}
               size="square"
               className={`toolbar-button ${mode === 'blur' ? 'active' : ''}`}
-              onClick={() => this.setState({ mode: 'blur' })}
+              onClick={() => this.setMode('blur')}
               title="Face Blur"
             />
             <Label
               icon={<Icon name="glassesWhite" size="xs"/>}
               size="square"
               className={`toolbar-button ${mode === 'glasses' ? 'active' : ''}`}
-              onClick={() => this.setState({ mode: 'glasses' })}
+              onClick={() => this.setMode('glasses')}
               title="Glasses"
             />
             <Label
               icon={<Icon name="shadesWhite" size="xs"/>}
               size="square"
               className={`toolbar-button ${mode === 'shades' ? 'active' : ''}`}
-              onClick={() => this.setState({ mode: 'shades' })}
+              onClick={() => this.setMode('shades')}
               title="Shades"
             />
           </div>
         </Header>
         { this.state.error ? err : content }
+        <BenchmarkModal
+          isOpen={this.state.benchmarkOpen}
+          running={this.state.benchmarkRunning}
+          tasks={this.state.benchmarkTasks}
+          results={this.state.benchmarkResults}
+          title="Webcam"
+          onStart={this.runBenchmark}
+          onRestart={this.runBenchmark}
+          onClose={() => this.setState({ benchmarkOpen: false })}
+        />
       </div>
     );
   }

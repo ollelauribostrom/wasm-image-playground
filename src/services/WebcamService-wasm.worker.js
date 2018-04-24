@@ -82,7 +82,8 @@ function findFace(frame) {
   const image = cv.matFromImageData(frame, 24);
   const faces = new cv.RectVector();
   const faceRects = [];
-  faceCascade.detectMultiScale(image, faces, 1.6, 3, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
+  cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 0);
+  faceCascade.detectMultiScale(image, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
   for(let i = 0; i < faces.size(); i+= 1) {
     faceRects.push(faces.get(i));
   }
