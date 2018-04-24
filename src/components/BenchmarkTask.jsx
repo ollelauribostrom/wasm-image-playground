@@ -18,10 +18,10 @@ function getStatusIcon(status) {
   }
 }
 
-function BenchmarkTask({ id, status, info, time, average, type }) {
+function BenchmarkTask({ id, status, info, time, average, type, iconSize = 's' }) {
   return (
     <div className="benchmark-task" key={id}>
-      {<Icon name={type} size="s" />}
+      {<Icon name={type} size={iconSize} />}
       <span className="benchmark-info">{info}</span>
       {time ? <span className="benchmark-time">Total: {time}ms</span> : null}
       {average ? <span className="benchmark-average">Average: {average}ms</span> : null }
