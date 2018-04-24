@@ -17,6 +17,9 @@ module.exports = env => {
     resolve: {
       extensions: ['.js', '.json', '.jsx']
     },
+    node: {
+      fs: 'empty'
+    },
     module: {
       rules: [
       // Workers loader
