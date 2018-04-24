@@ -11,13 +11,6 @@ function Home() {
         <Header
           title="WebAssembly"
           subtitle="Image Playground"
-          icon={
-            <Icon
-              name="wasm"
-              size="m"
-              style={{ marginRight: '10px' }}
-            />
-          }
         />
         <p className="Home-description">
           Play around with Image Processing and Object Detection using WebAssembly. Toggle between 
