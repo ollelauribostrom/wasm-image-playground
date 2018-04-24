@@ -4,6 +4,7 @@ import Home from './Home';
 import ImageEditor from './ImageEditor';
 import FaceDetector from './FaceDetector';
 import Webcam from './Webcam';
+import Credits from './Credits';
 import GithubLink from './GithubLink';
 import ImageService from '../services/ImageService';
 import '../styles/styles.css';
@@ -32,6 +33,7 @@ class App extends Component {
           <Route path="/image-editor" render={() => <ImageEditor {...this.state} />} />
           <Route path="/face-detector" render={() => <FaceDetector {...this.state} />} />
           <Route path="/webcam" render={() => <Webcam {...this.state} />} />
+          <Route path="/credits" render={() => <Credits {...this.state} />} />
           <GithubLink />
         </div>
       </Router>

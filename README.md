@@ -59,6 +59,20 @@ Credits
 - [React Router](https://github.com/ReactTraining/react-router) is used for routing
 - [Shortid](https://github.com/dylang/shortid) is used to generate short ids
 - [fps](https://github.com/hughsk/fps) is used to measure fps
+- "Alert" icon by Fabiano Coelho, from thenounproject.com.
+- "Gauge" icon by Guilhem, from thenounproject.com.
+- "Change" icon by Royyan Razka, from thenounproject.com.
+- "Done" icon by Besticons, from thenounproject.com.
+- "Close" icon by Sergey Demushkin, from thenounproject.com.
+- "Drag And Drop" icon by icon 54, from thenounproject.com.
+- "Drag And Drop" icon by icon 54, from thenounproject.com.
+- "Anonymity" icon by Ralf Schmitzer, from thenounproject.com.
+- "Scanner Face" icon by Thomas Helbig, from thenounproject.com.
+- "Glasses" icon by Vicons Design, from thenounproject.com.
+- "Stats" icon by Gregor Cresnar, from thenounproject.com.
+- "Sad" icon by Brian Dys Sahagun, from thenounproject.com.
+- "Setup" icon by Juraj Sedlák, from thenounproject.com.
+- "Sunglasses" icon by Daniela Baptista, from thenounproject.com.
 - and of course: React, Webpack, Babel, ESLint
 
 Support

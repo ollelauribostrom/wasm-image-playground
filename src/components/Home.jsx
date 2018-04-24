@@ -51,6 +51,13 @@ function Home() {
             className="Home-link"
           />
         </Link>
+        <Link to="/credits">
+          <Label text="Credits"
+            color="#654FF0"
+            size="large"
+            className="Home-link"
+          />
+        </Link>
       </div>
     </div>
   );
