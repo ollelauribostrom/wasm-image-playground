@@ -20,16 +20,13 @@ function Home() {
           }
         />
         <p className="Home-description">
-          Lorem ipsum dolor sit amet, an pro simul laboramus repudiandae, ad usu congue eligendi.
-          Vis reque tamquam verterem in. An suscipit intellegam quaerendum nam, nam no integre
-          conclusionemque. Quo at quando iuvaret officiis. Ut sea quot facilis.
-          Omnes iriure disputando cu qui.
+          Play around with Image Processing and Object Detection using WebAssembly. Toggle between 
+          JavaScript and WebAssembly mode to reveal the differences in performance.
         </p>
         <p className="Home-description">
-          No eum malorum epicurei, in nec prima illum eirmod. Movet iuvaret legendos ea pro, 
-          ex expetenda suavitate liberavisse mea. Pri no iriure alterum epicurei. Amet errem 
-          ne his. Vulputate efficiendi usu te, ad mel mundi vituperatoribus, ei reque malis
-          mazim sit. Sea solum audiam aperiri ex, nec eu virtute voluptua concludaturque.
+          The application contains a number of easy-to-run benchmarks, comparing JavaScript vs. WebAssembly
+          performance for some Image Processing and Object Detection related use cases. Click the green
+          benchmark button to get started.
         </p>
         <Link to="/image-editor">
           <Label
