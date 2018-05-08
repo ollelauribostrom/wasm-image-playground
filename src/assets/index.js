@@ -7,6 +7,7 @@ import drag from './drag.svg';
 import drop from './drop.svg';
 import faceBlur from './face-blur.svg';
 import faceRect from './face-rect.svg';
+import fast from './fast.svg';
 import gh from './gh.png';
 import glasses from './glasses.svg';
 import glassesWhite from './glasses-white.svg';
@@ -29,6 +30,7 @@ export default {
   drop,
   faceBlur,
   faceRect,
+  fast,
   gh,
   glasses,
   glassesWhite,

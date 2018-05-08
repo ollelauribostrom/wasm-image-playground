@@ -20,6 +20,7 @@ function Credits() {
       <p><Icon name="sad" size="xs" className="credits-icon" /> "Sad" icon by Brian Dys Sahagun, from thenounproject.com. </p>
       <p><Icon name="setup" size="xs" className="credits-icon bg-black" /> "Setup" icon by Juraj Sedlák, from thenounproject.com. </p>
       <p><Icon name="shades" size="xs" className="credits-icon" /> "Sunglasses" icon by Daniela Baptista, from thenounproject.com. </p>
+      <p><Icon name="fast" size="xs" className="credits-icon bg-black" /> "Fast" icon by artworkbean, from thenounproject.com. </p>
     </div>
   );
 }

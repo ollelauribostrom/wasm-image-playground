@@ -73,6 +73,7 @@ Credits
 - "Sad" icon by Brian Dys Sahagun, from thenounproject.com.
 - "Setup" icon by Juraj Sedlák, from thenounproject.com.
 - "Sunglasses" icon by Daniela Baptista, from thenounproject.com.
+- "Fast" icon by artworkbean, from thenounproject.com.
 - "Image" icon by Kaique Amorim, from thenounproject.com. (used in favicon)
 - and of course: React, Webpack, Babel, ESLint
 
