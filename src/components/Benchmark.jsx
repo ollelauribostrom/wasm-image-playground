@@ -6,7 +6,9 @@ import benchmarkImages from '../../benchmark/images.json'
 
 class Benchmark extends Component {
   state = {
+    taskIndex: 0,
     tasks: [],
+    taskResults: {},
     results: [],
     error: null,
     running: false,
@@ -27,7 +29,7 @@ class Benchmark extends Component {
 
   restart = async () => {
     if (!this.state.running && this.state.results) {
-      await this.setState({ tasks: [], results: [], error: null });
+      await this.setState({ tasks: [], results: [], error: null, taskIndex: 0, taskResults: {} });
       this.start();
     }
   }
@@ -56,15 +58,13 @@ class Benchmark extends Component {
         const data = await imageConverters.toUint8ClampedArray(URL.createObjectURL(blob));
         return { data, faces: image.faces }
       }));
+      await this.setState({ images });
       this.addOrUpdateTask({
         id: 'SETUP',
         info: `Loaded ${images.length} benchmark images`,
         status: 'done',
       });
-      ImageService.postMessage({
-        action: this.props.benchmarkType,
-        images
-      });
+      this.startTask(this.props.tasks[0]);
     } catch (error) {
       this.addOrUpdateTask({
         id: 'SETUP',
@@ -72,6 +72,15 @@ class Benchmark extends Component {
         status: 'error',
       });
     }
+  }
+
+  startTask = task => {
+    ImageService.postMessage({
+      task,
+      action: this.props.benchmarkType,
+      images: this.state.images,
+      results: task === 'getResults' ? this.state.taskResults : null
+    });
   }
 
   addOrUpdateTask = task => {
@@ -83,6 +92,17 @@ class Benchmark extends Component {
       tasks.push(task)
     }
     this.setState({ tasks });
+
+    if (task.status === 'done' && task.id !== 'SETUP') {
+      const taskResults = Object.assign({}, this.state.taskResults);
+      const currentTask = this.props.tasks[this.state.taskIndex];
+      const nextTask = this.props.tasks[this.state.taskIndex + 1];
+      taskResults[currentTask] = task.result;
+      this.setState({ taskResults, taskIndex: this.state.taskIndex + 1 });
+      if (nextTask) {
+        this.startTask(nextTask);
+      }
+    }
   }
 
   onUpdate = ({ data }) => {

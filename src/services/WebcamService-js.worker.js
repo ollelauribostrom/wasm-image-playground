@@ -48,10 +48,8 @@ function findEyes(frame) {
     increment: 0.11,
     baseScale: 2.0,
     scaleInc: 1.6,
-    minNeighbors: 1,
-    doCannny: true,
-    cannyLow: 60,
-    cannyHigh: 200
+    minNeighbors: 2,
+    doCannny: false
   });
   postMessage({ eyes });
 }

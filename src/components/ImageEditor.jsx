@@ -227,6 +227,15 @@ class ImageEditor extends Component {
             onClose={this.onBenchmarkClose}
             onStart={this.onBenchmarkStart}
             onStop={this.onBenchmarkStop}
+            tasks={[
+              'jsGrayscale',
+              'wasmGrayscale',
+              'jsBoxBlur',
+              'wasmBoxBlur',
+              'jsGaussian',
+              'wasmGaussian',
+              'getResults'
+            ]}
           />
           <div className={`drop-info ${this.state.originalImage ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>
             <Icon name={this.state.dragging ? 'drop' : 'drag'} size={this.state.dragging ? 'xl' : 'l'} />

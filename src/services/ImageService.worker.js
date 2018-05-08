@@ -89,79 +89,64 @@ function getTaskResult(task, js, wasm) {
   return stats;
 }
 
+function getTaskConfig(task, images) {
+  const tasks = {
+    jsGrayscale: { info: 'Converting to grayscale', type: 'js', fn: grayscaleJs, images },
+    wasmGrayscale: { info: 'Converting to grayscale', type: 'wasm', fn: grayscaleWasm, images },
+    jsBoxBlur: { info: 'Applying Box Blur', type: 'js', fn: boxBlurJs, images },
+    wasmBoxBlur: { info: 'Applying Box Blur', type: 'wasm', fn: boxBlurWasm, images },
+    jsGaussian: { info: 'Applying Gaussian Blur', type: 'js', fn: gaussianBlurJs, images },
+    wasmGaussian: { info: 'Applying Gaussian Blur', type: 'wasm', fn: gaussianBlurWasm, images }
+  }
+  return tasks[task];
+}
+
 function imageEditorBenchmark(data) {
-  const jsGrayscaleResult = performTask({
-    info: 'Converting to grayscale',
-    type: 'js',
-    images: data.images,
-    fn: grayscaleJs
-  });
-  const wasmGrayscaleResult = performTask({
-    info: 'Converting to grayscale',
-    type: 'wasm',
-    images: data.images,
-    fn: grayscaleWasm
-  });
-  const jsBoxBlurResult = performTask({
-    info: 'Applying Box Blur',
-    type: 'js',
-    images: data.images,
-    fn: boxBlurJs
-  });
-  const wasmBoxBlurResult = performTask({
-    info: 'Applying Box Blur',
-    type: 'wasm',
-    images: data.images,
-    fn: boxBlurWasm
-  });
-  const jsGaussianResult = performTask({
-    info: 'Applying Gaussian Blur',
-    type: 'js',
-    images: data.images,
-    fn: gaussianBlurJs
-  });
-  const wasmGaussianResult = performTask({
-    info: 'Applying Gaussian Blur',
-    type: 'wasm',
-    images: data.images,
-    fn: gaussianBlurWasm
-  });
-  postMessage({
-    type: 'benchmarkComplete',
-    results: [
-      getTaskResult('Grayscale', jsGrayscaleResult, wasmGrayscaleResult),
-      getTaskResult('Box Blur', jsBoxBlurResult, wasmBoxBlurResult),
-      getTaskResult('Gaussian Blur', jsGaussianResult, wasmGaussianResult)
-    ]
-  });
+  if (data.task === 'getResults') {
+    postMessage({
+      type: 'benchmarkComplete',
+      results: [
+        getTaskResult('Grayscale', data.results.jsGrayscale, data.results.wasmGrayscale),
+        getTaskResult('Box Blur', data.results.jsBoxBlur, data.results.wasmBoxBlur),
+        getTaskResult('Gaussian Blur', data.results.jsGaussian, data.results.wasmGaussian)
+      ]
+    });
+  } else {
+    performTask(getTaskConfig(data.task, data.images))
+  }
 }
 
 function faceDetectorBenchmark(data) {
-  console.log(data);
-  const jsResult = performDetectionTask({
-    info: 'Deteting faces',
-    type: 'js',
-    images: data.images,
-    fn: containsFaceJs
-  });
-  const wasmResult = performDetectionTask({
-    info: 'Detecting faces',
-    type: 'wasm',
-    images: data.images,
-    fn: containsFaceWasm
-  });
-  postMessage({
-    type: 'benchmarkComplete',
-    results: [
-      {
-        task: 'Face Detection',
-        fastest: jsResult.time < wasmResult.time ? 'JavaScript' : 'WebAssembly',
-        percent: {
-          total: round(wasmResult.time < jsResult.time ? ((jsResult.time / wasmResult.time) - 1) * 100 : ((wasmResult.time / jsResult.time) - 1) * 100, 2)
+  if (data.task === 'jsFaceDetection') {
+    performDetectionTask({
+      info: 'Deteting faces',
+      type: 'js',
+      images: data.images,
+      fn: containsFaceJs
+    });
+  } else if (data.task === 'wasmFaceDetection') {
+    performDetectionTask({
+      info: 'Detecting faces',
+      type: 'wasm',
+      images: data.images,
+      fn: containsFaceWasm
+    });
+  } else if (data.task === 'getResults') {
+    const jsResult = data.results.jsFaceDetection;
+    const wasmResult = data.results.wasmFaceDetection;
+    postMessage({
+      type: 'benchmarkComplete',
+      results: [
+        {
+          task: 'Face Detection',
+          fastest: jsResult.time < wasmResult.time ? 'JavaScript' : 'WebAssembly',
+          percent: {
+            total: round(wasmResult.time < jsResult.time ? ((jsResult.time / wasmResult.time) - 1) * 100 : ((wasmResult.time / jsResult.time) - 1) * 100, 2)
+          }
         }
-      }
-    ]
-  });
+      ]
+    });
+  }
 }
 
 function findFalsePositives(result, images) {
@@ -194,9 +179,9 @@ function performDetectionTask({ info, type, images, fn }) {
         type,
         time,
         status: 'done',
+        result: { result, time, foundFaces, falsePositives }
       }
     });
-    return { result, time, foundFaces, falsePositives };
   } catch (error) {
     console.log(error);
     postMessage({
@@ -232,9 +217,9 @@ function performTask({ info, type, images, fn }) {
         time,
         average,
         status: 'done',
+        result: { results, time, average }
       }
     });
-    return { results, time, average };
   } catch (error) {
     console.log(error);
     postMessage({

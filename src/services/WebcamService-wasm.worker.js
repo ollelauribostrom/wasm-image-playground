@@ -83,7 +83,7 @@ function findFace(frame) {
   const faces = new cv.RectVector();
   const faceRects = [];
   cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 0);
-  faceCascade.detectMultiScale(image, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
+  faceCascade.detectMultiScale(image, faces, 1.6, 2, 0, new cv.Size(50, 50));
   for(let i = 0; i < faces.size(); i+= 1) {
     faceRects.push(faces.get(i));
   }
@@ -96,29 +96,14 @@ function findEyes(frame) {
   loadFaceCascade();
   loadEyesCascade();
   const image = cv.matFromImageData(frame, 24);
-  const imageGray = new cv.Mat();
-  const faces = new cv.RectVector();
-  const eyesRect = [];
-  cv.cvtColor(image, imageGray, cv.COLOR_RGBA2GRAY, 0);
-  faceCascade.detectMultiScale(imageGray, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE, new cv.Size(50, 50));
-  for(let i = 0; i < faces.size(); i+= 1) {
-    const faceRect = faces.get(i)
-    const faceGray = imageGray.roi(faceRect);
-		const eyes = new cv.RectVector();
-		eyesCascade.detectMultiScale(faceGray, eyes, 1.6, 2, 0);
-		for (let j = 0; j < eyes.size(); j += 1) {
-      let eyeRect = eyes.get(j);
-			eyesRect.push({
-        x: faceRect.x + eyeRect.x,
-        y: faceRect.y + eyeRect.y,
-        width: eyeRect.width,
-        height: eyeRect.height
-      });
-		}
-		eyes.delete();
+  const eyes = new cv.RectVector();
+  const eyesRects = [];
+  cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY, 0);
+  eyesCascade.detectMultiScale(image, eyes, 1.6, 2, 0, new cv.Size(10, 10));
+  for(let i = 0; i < eyes.size(); i+= 1) {
+    eyesRects.push(eyes.get(i));
   }
   image.delete();
-  imageGray.delete();
-  faces.delete();
-  postMessage({ eyes: eyesRect });
+  eyes.delete();
+  postMessage({ eyes: eyesRects });
 }

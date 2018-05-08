@@ -193,6 +193,11 @@ class FaceDetector extends Component {
             onClose={this.onBenchmarkClose}
             onStart={this.onBenchmarkStart}
             onStop={this.onBenchmarkStop}
+            tasks={[
+              'jsFaceDetection',
+              'wasmFaceDetection',
+              'getResults'
+            ]}
           />
           { images }
           <div className={`drop-info ${this.state.images.length ? 'drop-info-hidden' : ''}`} onClick={() => this.input.click()}>

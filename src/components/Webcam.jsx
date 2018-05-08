@@ -183,9 +183,9 @@ class Webcam extends Component {
     });
   }
 
-  drawFrame = (data) => {
-    const canvas = this.state.wasmMode ? this.wasmcanvas : this.jscanvas;
-    const ctx = this.state.wasmMode ? this.wasmCtx : this.jsCtx;
+  drawFrame = (data, type) => {
+    const canvas = type === 'wasm' ? this.wasmcanvas : this.jscanvas;
+    const ctx = type === 'wasm' ? this.wasmCtx : this.jsCtx;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.filter = 'none';
     ctx.drawImage(this.video, 0, 0);
@@ -193,7 +193,7 @@ class Webcam extends Component {
     if (mode === 'rectangle') {
       const { x, y, width, height } = calcFacePosition(data.face);
       ctx.beginPath();
-      ctx.strokeStyle = this.state.wasmMode ? '#633df8' : '#fecb00';
+      ctx.strokeStyle = type === 'wasm' ? '#633df8' : '#fecb00';
       ctx.lineWidth = 2;
       ctx.rect(x, y, width, height);
       ctx.stroke();
@@ -260,8 +260,8 @@ class Webcam extends Component {
       <div className="component-content">
         <video ref={video => this.video = video } autoPlay={true} className="Webcam-video"/>
         <canvas 
-          ref={canvas => this.wasmcanvas = canvas} 
-          className="Webcam-canvas"
+          ref={wasmcanvas => this.wasmcanvas = wasmcanvas} 
+          className="Webcam-canvas wasm-canvas"
           style={{
             display: this.state.wasmMode ? 'flex' : 'none'
           }}
@@ -269,8 +269,8 @@ class Webcam extends Component {
           height="400"
         />
         <canvas 
-          ref={canvas => this.jscanvas = canvas} 
-          className="Webcam-canvas"
+          ref={jscanvas => this.jscanvas = jscanvas} 
+          className="Webcam-canvas js-canvas"
           style={{
             display: !this.state.wasmMode ? 'flex' : 'none'
           }}
