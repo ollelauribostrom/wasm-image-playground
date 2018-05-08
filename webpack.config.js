@@ -25,7 +25,10 @@ module.exports = env => {
       // Workers loader
       {
         test: /\.worker\.js$/,
-        use: { loader: 'worker-loader' }
+        use: {
+          loader: 'worker-loader',
+          options: { name: '[name].[hash].js' }
+        }
       },
       // EsLint
       {
