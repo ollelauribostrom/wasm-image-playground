@@ -3581,9 +3581,9 @@ imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
 
-imutils@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/imutils/-/imutils-1.0.1.tgz#8daf36d78ced8c60f8948c7b4b235e62f2bb773e"
+imutils@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/imutils/-/imutils-1.0.2.tgz#3b6e94a506f6df3fa932f5af8aebc9c00bdaea1c"
   dependencies:
     shortid "^2.2.8"
 
