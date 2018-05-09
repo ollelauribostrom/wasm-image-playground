@@ -145,11 +145,11 @@ class FaceDetector extends Component {
     const images = this.state.images.map((image) => {
       return (
         <div class="uploaded-image">
-         {image.faceCount ? <span>{image.faceCount}</span> : null }
+         {image.faceDetected ? <span><Icon name="check" size="xs"/></span> : null }
           <img 
             src={image.data}
             alt="uploaded"
-            className={image.faceCount > 0 ? 'contains-face' : ''}
+            className={image.faceDetected ? 'contains-face' : ''}
             key={image.id}
           />
         </div>

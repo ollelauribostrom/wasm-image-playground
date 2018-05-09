@@ -56,7 +56,7 @@ class Benchmark extends Component {
         const res = await fetch(require(`../../benchmark/${image.path}`));
         const blob = await res.blob();
         const data = await imageConverters.toUint8ClampedArray(URL.createObjectURL(blob));
-        return { data, faces: image.faces }
+        return { data, containsFace: image.containsFace }
       }));
       await this.setState({ images });
       this.addOrUpdateTask({

@@ -152,14 +152,15 @@ function faceDetectorBenchmark(data) {
 function findFalsePositives(result, images) {
   let count = 0;
   for (let i = 0; i < result.length; i++) {
-    if (result[i].faceCount > images[i].faces) {
-      count += result[i].faceCount - images[i].faces;
+    if (result[i].containsFace !== images[i].faceDetected) {
+      count += 1;
     }
   }
   return count;
 }
 
 function performDetectionTask({ info, type, images, fn }) {
+  console.log(images);
   const id = shortid.generate();
   postMessage({
     type: 'benchmarkUpdate',
@@ -168,14 +169,14 @@ function performDetectionTask({ info, type, images, fn }) {
   try {
     const result = fn({ images }, true);
     const time = round(result.time, 2);
-    const expectedFaces = images.reduce((total, img) => total + img.faces, 0);
-    const foundFaces = result.result.reduce((total, r) => total + r.faceCount, 0);
-    const falsePositives = findFalsePositives(result.result, images);
+    const expectedFaces = result.result.filter(img => img.containsFace).length;
+    const foundFaces = result.result.filter(img => img.faceDetected && img.containsFace).length;
+    const falsePositives = result.result.filter(img => img.containsFace !== img.faceDetected).length;
     postMessage({
       type: 'benchmarkUpdate',
       task: {
         id,
-        info: `Detected ${foundFaces}/${expectedFaces} faces (${falsePositives} false positives)`,
+        info: `Detected faces in ${foundFaces}/${expectedFaces} images (${falsePositives} false positives)`,
         type,
         time,
         status: 'done',
@@ -188,7 +189,7 @@ function performDetectionTask({ info, type, images, fn }) {
       type: 'benchmarkError',
       error
     });
-  } 
+  }
 }
 
 function performTask({ info, type, images, fn }) {
@@ -327,12 +328,12 @@ function loadFaceCascade() {
   }
 }
 
-function performFaceCount(config, fn) {
+function performFaceDetection(config, fn) {
   const { result, time, error } = timed(fn, config);
   const { returnResult, language } = config;
-  const faces = result.reduce((count, img) => count + img.faceCount, 0);
-  const faceNoun = faces === 1 ? 'face' : 'faces';
-  const info = `Found ${faces} ${faceNoun}`;
+  const imagesWithFaces = result.filter(img => img.faceDetected).length;
+  const imageNoun = imagesWithFaces === 1 ? 'image' : 'images';
+  const info = `Found faces in ${imagesWithFaces} ${imageNoun}`;
   if (returnResult) {
     return { result, time, error };
   }
@@ -345,7 +346,7 @@ function performFaceCount(config, fn) {
 
 function containsFaceWasm({ images }, returnResult) {
   loadFaceCascade();
-  return performFaceCount({
+  return performFaceDetection({
     action: 'detect faces',
     language: 'WebAssembly',
     returnResult
@@ -354,8 +355,8 @@ function containsFaceWasm({ images }, returnResult) {
       const image = cv.matFromImageData(img.data, 24);
       const faces = new cv.RectVector();
       cv.cvtColor(image, image, cv.COLOR_RGBA2GRAY);
-      faceCascade.detectMultiScale(image, faces, 1.6, 2, 0|cv.CASCADE_SCALE_IMAGE);
-      img.faceCount = faces.size();
+      faceCascade.detectMultiScale(image, faces, 1.6, 2, 1);
+      img.faceDetected = faces.size() > 0;
       image.delete();
       faces.delete();
       return img;
@@ -364,7 +365,7 @@ function containsFaceWasm({ images }, returnResult) {
 }
 
 function containsFaceJs({ images }, returnResult) {
-  return performFaceCount({
+  return performFaceDetection({
     action: 'detect faces',
     language: 'JS',
     returnResult
@@ -372,13 +373,15 @@ function containsFaceJs({ images }, returnResult) {
     return images.map(img => {
       const faces = detect('face', img.data, {
         ratio: 1,
-        increment: 0.12,
-        baseScale: 1.0,
+        increment: 0.08,
+        baseScale: 2.0,
         scaleInc: 1.6,
         minNeighbors: 2,
-        doCanny: false
+        doCannny: true,
+        cannyLow: 60,
+        cannyHigh: 200,
       });
-      img.faceCount = faces.length;
+      img.faceDetected = faces.length > 0;
       return img;
     });
   });
