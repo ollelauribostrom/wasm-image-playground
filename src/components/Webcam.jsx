@@ -24,6 +24,7 @@ class Webcam extends Component {
   state = {
     mode: 'rectangle',
     wasmMode: false,
+    superpowers: false,
     info: null,
     infoTimeout: null,
     wasmFps: 0,
@@ -62,7 +63,9 @@ class Webcam extends Component {
   onWasmMessage = ({ data }) => {
     this.wasmFps.tick();
     if (this.state.benchmarkRunning) {
-      const detection = data.eyes || data.face;
+      const { mode } = this.state;
+      const isFace = mode === 'rectangle' || mode === 'blur';
+      const detection = isFace ? data.face : data.eyes || [];
       wasmBenchmark.tick(detection.length);
     }
     this.getNextFrame('wasm');
@@ -73,7 +76,9 @@ class Webcam extends Component {
   onJsMessage = ({ data }) => {
     this.jsFps.tick();
     if (this.state.benchmarkRunning) {
-      const detection = data.eyes || data.face;
+      const { mode } = this.state;
+      const isFace = mode === 'rectangle' || mode === 'blur';
+      const detection = isFace ? data.face : data.eyes || [];
       jsBenchmark.tick(detection.length);
     }
     this.getNextFrame('js');
@@ -191,7 +196,7 @@ class Webcam extends Component {
     ctx.drawImage(this.video, 0, 0);
     const mode = this.state.mode;
     if (mode === 'rectangle') {
-      const { x, y, width, height } = calcFacePosition(data.face);
+      const { x, y, width, height } = calcFacePosition(data.face) || {};
       ctx.beginPath();
       ctx.strokeStyle = type === 'wasm' ? '#633df8' : '#fecb00';
       ctx.lineWidth = 2;
@@ -200,7 +205,7 @@ class Webcam extends Component {
       return ctx.closePath();
     }
     if (mode === 'blur') {
-      const { x, y, width, height } = calcFacePosition(data.face);
+      const { x, y, width, height } = calcFacePosition(data.face) || {};
       ctx.filter = 'blur(10px)';
       return ctx.drawImage(this.video, x, y, width, height, x, y, width, height);
     }
@@ -220,7 +225,8 @@ class Webcam extends Component {
     this.webcamService.postMessage({
       action: this.state.mode,
       type,
-      frame: this.bufferCtx.getImageData(0, 0, this.buffer.width, this.buffer.height)
+      frame: this.bufferCtx.getImageData(0, 0, this.buffer.width, this.buffer.height),
+      superpowers: this.state.superpowers
     });
   }
 
@@ -292,6 +298,13 @@ class Webcam extends Component {
           size="medium"
           className="fps js-fps"
           title="JavaScript FPS"
+        />
+        <Label
+          icon={<Icon name="fast" size="xs"/>}
+          size="small"
+          className={`superpowers ${this.state.superpowers? 'active' : ''}`}
+          onClick={() => this.setState({ superpowers: !this.state.superpowers })}
+          title="Toggle Superpowers"
         />
       </div>      
     );

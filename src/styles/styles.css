@@ -288,7 +288,7 @@ a {
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: #2fcb6e;
+  background-color: #fff;
   padding: 10px;
   width: 20px;
   height: 20px;
@@ -323,7 +323,7 @@ a {
 /* WasmMode component */
 .wasm-mode,
 .js-mode {
-  margin-left: 25px;
+  margin-left: 20px;
   transition: 0.3s all;
 }
 
@@ -346,6 +346,17 @@ a {
 
 .js-mode:hover {
   background-color: #e2bc23;
+}
+
+.superpowers {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #5b5b5b;
+}
+
+.superpowers.active {
+  background-color: #2fcb6e;
 }
 
 /* Webcam */
