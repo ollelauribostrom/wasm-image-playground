@@ -1,44 +1,17 @@
-import React, { Component } from 'react';
-import { BrowserRouter as Router, Route } from  'react-router-dom';
-import Home from './Home';
-import ImageEditor from './ImageEditor';
-import FaceDetector from './FaceDetector';
-import Webcam from './Webcam';
-import Credits from './Credits';
-import GithubLink from './GithubLink';
-import ImageService from '../services/ImageService';
-import '../styles/styles.css';
+import React from 'react';
+import { Provider } from '../store/AppStore';
+import ErrorBoundary from './ErrorBoundary';
+import Reactor from './Reactor';
+import Count from './Count';
+import '../styles/main.css';
 
-class App extends Component {
-  state = {
-    serviceLoaded: false,
-    serviceError: null,
-    serviceLoadTime: null
-  }
-
-  async componentWillMount() {
-    ImageService.on('loaded', () => this.setState({ serviceLoaded: true }));
-    ImageService.on('error', () => this.setState({
-      serviceLoaded: true,
-      serviceError: 'Error loading OpenCv',
-    }))
-    ImageService.init();
-  }
-
-  render() {
-    return (
-      <Router>
-        <div className="App">
-          <Route exact path="/" component={Home} />
-          <Route path="/image-editor" render={() => <ImageEditor {...this.state} />} />
-          <Route path="/face-detector" render={() => <FaceDetector {...this.state} />} />
-          <Route path="/webcam" render={() => <Webcam {...this.state} />} />
-          <Route path="/credits" render={() => <Credits {...this.state} />} />
-          <GithubLink />
-        </div>
-      </Router>
-    );
-  }
+export default function App() {
+  return (
+    <Provider>
+      <ErrorBoundary>
+        <Reactor />
+        <Count />
+      </ErrorBoundary>
+    </Provider>
+  );
 }
-
-export default App;

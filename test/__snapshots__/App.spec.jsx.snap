@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for App it renders correctly 1`] = `
+<o>
+  <ErrorBoundary>
+    <Connect(Reactor) />
+    <Connect(Count) />
+  </ErrorBoundary>
+</o>
+`;

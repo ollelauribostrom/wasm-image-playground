@@ -1,127 +1,67 @@
-const path = require("path");
-const autoprefixer = require('autoprefixer');
+const path = require('path');
+const HtmlWebPackPlugin = require('html-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
-module.exports = env => {
-  const config = {
-    mode: 'development',
-    entry: {
-      main: path.resolve(__dirname, 'src/index.js'),
-    },
-    output: {
-      filename: '[name].bundle.js',
-      chunkFilename: '[name].bundle.js',
-      path: path.resolve(__dirname, 'dist/'),
-      publicPath: '/dist/',
-    },
-    devtool: 'source-map',
-    resolve: {
-      extensions: ['.js', '.json', '.jsx']
-    },
-    node: {
-      fs: 'empty'
-    },
-    module: {
-      rules: [
+module.exports = publicPath => ({
+  entry: {
+    main: './src/index.jsx'
+  },
+  output: {
+    filename: '[name].bundle.js',
+    chunkFilename: '[name].bundle.js',
+    path: path.resolve(__dirname, 'dist/'),
+    publicPath: publicPath || '/'
+  },
+  devtool: 'source-map',
+  resolve: {
+    extensions: ['.js', '.json', '.jsx']
+  },
+  module: {
+    rules: [
       // Workers loader
       {
         test: /\.worker\.js$/,
         use: {
           loader: 'worker-loader',
-          options: { name: '[name].[hash].js' }
+          options: { name: '[name].js', publicPath: publicPath || '/' }
         }
       },
-      // EsLint
+      // Process JS with Babel.
       {
         test: /\.(js|jsx)$/,
-        enforce: 'pre',
+        include: path.resolve(__dirname, 'src/'),
+        loader: require.resolve('babel-loader')
+      },
+      // HTML
+      {
+        test: /\.html$/,
         use: [
           {
-            options: {
-              eslintPath: require.resolve('eslint'),
-              
-            },
-            loader: require.resolve('eslint-loader'),
-          },
-        ],
-        include: path.resolve(__dirname, 'src/'),
-      },
-      {
-        oneOf: [
-          // Image loader
-          {
-            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            loader: require.resolve('url-loader'),
-            options: {
-              limit: 10000,
-              name: 'static/media/[name].[hash:8].[ext]',
-            },
-          },
-          // Process JS with Babel.
-          {
-            test: /\.(js|jsx)$/,
-            include: path.resolve(__dirname, 'src/'),
-            loader: require.resolve('babel-loader'),
-            options: { cacheDirectory: true },
-          },
-          // CSS
-          {
-            test: /\.css$/,
-            use: [
-              require.resolve('style-loader'),
-              {
-                loader: require.resolve('css-loader'),
-                options: {
-                  importLoaders: 1,
-                },
-              },
-              {
-                loader: require.resolve('postcss-loader'),
-                options: {
-                  // Necessary for external CSS imports to work
-                  // https://github.com/facebookincubator/create-react-app/issues/2677
-                  ident: 'postcss',
-                  plugins: () => [
-                    require('postcss-flexbugs-fixes'),
-                    autoprefixer({
-                      browsers: [
-                        '>1%',
-                        'last 4 versions',
-                        'Firefox ESR',
-                        'not ie < 9', // React doesn't support IE8 anyway
-                      ],
-                      flexbox: 'no-2009',
-                    }),
-                  ],
-                },
-              },
-            ],
-          },
-          {
-            // Files
-            exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
-            loader: require.resolve('file-loader'),
-            options: {
-              name: 'static/media/[name].[hash:8].[ext]',
-            },
-          },
-        ],
-      },
-      // ** STOP ** Are you adding a new loader?
-      // Make sure to add the new loader(s) before the "file" loader.
+            loader: 'html-loader',
+            options: { minimize: true }
+          }
         ]
-    },
-    externals: {
-        "react": "React",
-        "react-dom": "ReactDOM"
-    },
-    plugins: [],
-    devServer: {
-      historyApiFallback: { disableDotRule: true },
-      stats: "minimal",
-      port: 3000,
-      open: true
-    }
-  };
-
-  return config;
-};
+      },
+      // CSS
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] }
+    ]
+  },
+  plugins: [
+    new CleanWebpackPlugin('./dist'),
+    new HtmlWebPackPlugin({
+      template: './public/index.html',
+      favicon: './public/favicon.ico',
+      filename: 'index.html'
+    }),
+    new CopyWebpackPlugin([{ from: './public/manifest.json' }])
+  ],
+  externals: {
+    react: 'React',
+    'react-dom': 'ReactDOM'
+  },
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    port: 3000
+  }
+});
