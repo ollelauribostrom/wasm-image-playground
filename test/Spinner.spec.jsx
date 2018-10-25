@@ -4,6 +4,9 @@ import { Spinner } from '../src/components/Spinner';
 
 describe('Tests for Spinner', () => {
   it('renders correctly', () => {
-    expect(shallow(<Spinner />)).toMatchSnapshot();
+    expect(shallow(<Spinner isLoading />)).toMatchSnapshot();
+  });
+  it('renders empty when IsLoading = false', () => {
+    expect(shallow(<Spinner isLoading={false} />)).toBeEmptyRender();
   });
 });

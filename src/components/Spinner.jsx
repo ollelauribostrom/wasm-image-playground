@@ -1,7 +1,11 @@
 import React from 'react';
 
-export function Spinner() {
-  return (
+type SpinnerProps = {
+  isLoading: boolean
+};
+
+export function Spinner({ isLoading }: SpinnerProps) {
+  return isLoading ? (
     <div className="sk-circle">
       <div className="sk-circle1 sk-child" />
       <div className="sk-circle2 sk-child" />
@@ -16,5 +20,5 @@ export function Spinner() {
       <div className="sk-circle11 sk-child" />
       <div className="sk-circle12 sk-child" />
     </div>
-  );
+  ) : null;
 }

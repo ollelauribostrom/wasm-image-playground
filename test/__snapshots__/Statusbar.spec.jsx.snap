@@ -4,6 +4,9 @@ exports[`Tests for Statusbar renders correctly 1`] = `
 <div
   className="statusbar"
 >
+  <Spinner
+    isLoading={false}
+  />
   <Icon
     name="info"
   />
@@ -17,7 +20,9 @@ exports[`Tests for Statusbar renders correctly when loading 1`] = `
 <div
   className="statusbar"
 >
-  <Spinner />
+  <Spinner
+    isLoading={true}
+  />
   <span>
     test-status
   </span>

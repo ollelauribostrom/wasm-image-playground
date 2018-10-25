@@ -11,7 +11,8 @@ type StatusbarProps = {
 function Statusbar({ status, isLoading }: StatusbarProps) {
   return (
     <div className="statusbar">
-      {isLoading ? <Spinner /> : <Icon name="info" />}
+      <Spinner isLoading={isLoading} />
+      {isLoading ? null : <Icon name="info" />}
       <span>{status}</span>
     </div>
   );
