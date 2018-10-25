@@ -1,0 +1,9 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for ErrorBoundary should catch errors thrown from child components 1`] = `
+<ErrorBoundary>
+  <span>
+    Error Boundary Caught: Thrown from child
+  </span>
+</ErrorBoundary>
+`;

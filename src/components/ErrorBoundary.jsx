@@ -1,14 +1,10 @@
 import React, { Component } from 'react';
 
-type ErrorBoundaryProps = {
-  children: any
-};
-
 type ErrorBoundaryState = {
-  error: ?Error
+  error?: Error
 };
 
-class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+class ErrorBoundary extends Component<{}, ErrorBoundaryState> {
   state = {
     error: null
   };
@@ -18,12 +14,10 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   render() {
-    const { error } = this.state;
-    const { children } = this.props;
-    if (error) {
-      return <span>{`Error Boundary Caught: ${error.message}`}</span>;
+    if (this.state.error) {
+      return <span>{`Error Boundary Caught: ${this.state.error.message}`}</span>;
     }
-    return children;
+    return this.props.children;
   }
 }
 
