@@ -9,10 +9,11 @@ type StatusbarProps = {
 };
 
 function Statusbar({ status, isLoading }: StatusbarProps) {
+  const showIcon = !isLoading && status;
   return (
     <div className="statusbar">
       <Spinner isLoading={isLoading} />
-      {isLoading ? null : <Icon name="info" />}
+      {showIcon ? <Icon name="info" /> : null}
       <span>{status}</span>
     </div>
   );
