@@ -1,0 +1,535 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for Header renders correctly 1`] = `
+<div
+  className="header"
+>
+  <div
+    className="header__logo"
+  >
+    <Icon
+      name="image"
+    />
+  </div>
+  <div
+    className="header__toolbar"
+  >
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="blur"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Blur image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="bw"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Convert image to grayscale"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="sharpen"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Sharpen image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="invert"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Invert image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="cool"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Apply cooling filter"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--benchmark"
+      href={null}
+      icon={
+        <Icon
+          name="benchmark"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Open benchmark "
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="undo"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Undo last action"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="download"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Download"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="delete"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Delete"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="js"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={[Function]}
+      rel={null}
+      target={null}
+      title="Current language mode"
+    />
+  </div>
+</div>
+`;
+
+exports[`Tests for Header renders correctly when app is loading 1`] = `
+<div
+  className="header"
+>
+  <div
+    className="header__logo"
+  >
+    <Icon
+      name="image"
+    />
+  </div>
+  <div
+    className="header__toolbar"
+  >
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="blur"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Blur image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="bw"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Convert image to grayscale"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="sharpen"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Sharpen image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="invert"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Invert image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="cool"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Apply cooling filter"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--benchmark"
+      href={null}
+      icon={
+        <Icon
+          name="benchmark"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Open benchmark "
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="undo"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Undo last action"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="download"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Download"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="delete"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Delete"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="js"
+        />
+      }
+      isDisabled={true}
+      label={null}
+      onClick={[Function]}
+      onToggle={[Function]}
+      rel={null}
+      target={null}
+      title="Current language mode"
+    />
+  </div>
+</div>
+`;
+
+exports[`Tests for Header renders correctly when language is wasm 1`] = `
+<div
+  className="header"
+>
+  <div
+    className="header__logo"
+  >
+    <Icon
+      name="image"
+    />
+  </div>
+  <div
+    className="header__toolbar"
+  >
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="blur"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Blur image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="bw"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Convert image to grayscale"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="sharpen"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Sharpen image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="invert"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Invert image"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--filter"
+      href={null}
+      icon={
+        <Icon
+          name="cool"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Apply cooling filter"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--benchmark"
+      href={null}
+      icon={
+        <Icon
+          name="benchmark"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Open benchmark "
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="undo"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Undo last action"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="download"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Download"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="delete"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={null}
+      rel={null}
+      target={null}
+      title="Delete"
+    />
+    <Button
+      customClassName="toolbar__button toolbar__button--action"
+      href={null}
+      icon={
+        <Icon
+          name="wasm"
+        />
+      }
+      isDisabled={false}
+      label={null}
+      onClick={[Function]}
+      onToggle={[Function]}
+      rel={null}
+      target={null}
+      title="Current language mode"
+    />
+  </div>
+</div>
+`;
