@@ -1,0 +1,67 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for Button renders correctly 1`] = `
+<div
+  className="button testClass"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex={0}
+  title="testTitle"
+  type="button"
+>
+  <Icon
+    name="image"
+  />
+</div>
+`;
+
+exports[`Tests for Button renders correctly when passing the href prop 1`] = `
+<a
+  className="button "
+  href="testHref"
+  rel="testRel"
+  target="testTarget"
+  title=""
+>
+  label
+  <Icon
+    name="image"
+  />
+</a>
+`;
+
+exports[`Tests for Button renders correctly when passing the isDisabled prop 1`] = `
+<div
+  className="button testClass"
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex={0}
+  title=""
+  type="button"
+>
+  <Icon
+    name="image"
+  />
+</div>
+`;
+
+exports[`Tests for Button renders correctly when passing the onToggle prop 1`] = `
+<div
+  className="button "
+  onClick={[Function]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex={0}
+  title="testTitle"
+  type="button"
+>
+  <Icon
+    name="image"
+  />
+  <ToggleHandle
+    onToggle={[Function]}
+  />
+</div>
+`;

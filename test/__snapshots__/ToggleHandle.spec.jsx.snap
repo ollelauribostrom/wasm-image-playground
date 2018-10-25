@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for ToggleHandle renders correctly 1`] = `
+<div
+  className="toggle__handle"
+  onClick={[MockFunction]}
+  onKeyPress={[Function]}
+  role="button"
+  tabIndex={0}
+>
+  <Icon
+    name="toggle"
+  />
+</div>
+`;
