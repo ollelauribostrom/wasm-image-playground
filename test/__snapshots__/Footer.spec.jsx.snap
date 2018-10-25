@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for Footer renders correctly 1`] = `
+<div
+  className="footer"
+>
+  <Connect(Statusbar) />
+  <Button
+    customClassName="footer__button"
+    href="https://github.com/ollelauribostrom/wasm-image-playground#credits"
+    icon={null}
+    isDisabled={false}
+    label="Credits"
+    onClick={[Function]}
+    onToggle={null}
+    rel="noopener noreferrer"
+    target="_blank"
+    title=""
+  />
+  <Button
+    customClassName="footer__button"
+    href="https://github.com/ollelauribostrom/wasm-image-playground"
+    icon={
+      <Icon
+        name="github"
+      />
+    }
+    isDisabled={false}
+    label="View on"
+    onClick={[Function]}
+    onToggle={null}
+    rel="noopener noreferrer"
+    target="_blank"
+    title=""
+  />
+</div>
+`;
