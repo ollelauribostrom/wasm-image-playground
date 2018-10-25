@@ -1,7 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
 import { Icon } from '../src/components/Icon';
-import 'jest-enzyme';
 
 describe('Tests for Icon', () => {
   it('renders correctly: image icon', () => {
@@ -45,6 +44,12 @@ describe('Tests for Icon', () => {
   });
   it('renders correctly: drag icon', () => {
     expect(shallow(<Icon name="drag" />)).toMatchSnapshot();
+  });
+  it('renders correctly: wasm icon', () => {
+    expect(shallow(<Icon name="wasm" />)).toMatchSnapshot();
+  });
+  it('renders correctly: github icon', () => {
+    expect(shallow(<Icon name="github" />)).toMatchSnapshot();
   });
   it('returns null for unknown icon name', () => {
     expect(shallow(<Icon name="nonexisting" />)).toBeEmptyRender();

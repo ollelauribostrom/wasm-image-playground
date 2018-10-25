@@ -14,6 +14,8 @@ exports[`Tests for Icon renders correctly: download icon 1`] = `<IconDownload />
 
 exports[`Tests for Icon renders correctly: drag icon 1`] = `<IconDrag />`;
 
+exports[`Tests for Icon renders correctly: github icon 1`] = `<IconGithub />`;
+
 exports[`Tests for Icon renders correctly: image icon 1`] = `<IconImage />`;
 
 exports[`Tests for Icon renders correctly: info icon 1`] = `<IconInfo />`;
@@ -27,3 +29,5 @@ exports[`Tests for Icon renders correctly: sharpen icon 1`] = `<IconSharpen />`;
 exports[`Tests for Icon renders correctly: toggle icon 1`] = `<IconToggle />`;
 
 exports[`Tests for Icon renders correctly: undo icon 1`] = `<IconUndo />`;
+
+exports[`Tests for Icon renders correctly: wasm icon 1`] = `<IconWasm />`;
