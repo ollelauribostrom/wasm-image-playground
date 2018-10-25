@@ -1,10 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Tests for App it renders correctly 1`] = `
-<o>
+exports[`Tests for App renders correctly 1`] = `
+<Provider>
   <ErrorBoundary>
-    <Connect(Reactor) />
-    <Connect(Count) />
+    <Header />
+    <Droppable
+      onDragEnd={[Function]}
+      onDragStart={[Function]}
+      onDrop={[Function]}
+    >
+      <ImageView />
+    </Droppable>
+    <Footer />
   </ErrorBoundary>
-</o>
+</Provider>
 `;

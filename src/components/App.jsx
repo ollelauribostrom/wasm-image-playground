@@ -1,16 +1,29 @@
 import React from 'react';
-import { Provider } from '../store/AppStore';
+import { Provider, actions } from '../store/AppStore';
 import ErrorBoundary from './ErrorBoundary';
-import Reactor from './Reactor';
-import Count from './Count';
+import Header from './Header';
+import { Footer } from './Footer';
+import ImageView from './ImageView';
+import { Droppable } from './Droppable';
 import '../styles/main.css';
 
 export default function App() {
   return (
     <Provider>
       <ErrorBoundary>
-        <Reactor />
-        <Count />
+        <Header />
+        <Droppable
+          onDrop={async e => {
+            e.preventDefault();
+            actions.setLoading(true);
+            await actions.upload(e.target.files || e.dataTransfer.files);
+          }}
+          onDragStart={() => actions.setDragging(true)}
+          onDragEnd={() => actions.setDragging(false)}
+        >
+          <ImageView />
+        </Droppable>
+        <Footer />
       </ErrorBoundary>
     </Provider>
   );
