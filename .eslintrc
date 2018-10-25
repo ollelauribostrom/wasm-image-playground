@@ -6,7 +6,8 @@
     "prettier/prettier": ["error"],
     "no-use-before-define": 0,
     "lines-between-class-members": 0,
-    "import/prefer-default-export": 0
+    "import/prefer-default-export": 0,
+    "react/destructuring-assignment": ["always", { "ignoreClassFields": true }]
   },
   "env": {
     "jest": true,
