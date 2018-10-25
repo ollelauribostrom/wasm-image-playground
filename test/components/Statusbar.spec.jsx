@@ -1,8 +1,8 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import Statusbar from '../src/components/Statusbar';
+import Statusbar from '../../src/components/Statusbar';
 
-jest.mock('../src/store/AppStore', () => ({
+jest.mock('../../src/store/AppStore', () => ({
   connect: () => arg => arg
 }));
 

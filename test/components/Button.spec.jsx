@@ -1,7 +1,7 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import { Button } from '../src/components/Button';
-import { Icon } from '../src/components/Icon';
+import { Button } from '../../src/components/Button';
+import { Icon } from '../../src/components/Icon';
 
 describe('Tests for Button', () => {
   it('renders correctly', () => {

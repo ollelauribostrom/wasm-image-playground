@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { mount } from 'enzyme';
-import ErrorBoundary from '../src/components/ErrorBoundary';
+import ErrorBoundary from '../../src/components/ErrorBoundary';
 
 class Child extends Component {
   render() {

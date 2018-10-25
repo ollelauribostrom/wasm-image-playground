@@ -1,6 +1,6 @@
 import React from 'react';
 import { shallow } from 'enzyme';
-import { ToggleHandle } from '../src/components/ToggleHandle';
+import { ToggleHandle } from '../../src/components/ToggleHandle';
 import 'jest-enzyme';
 
 describe('Tests for ToggleHandle', () => {
