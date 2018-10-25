@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for Icon renders correctly: benchmark icon 1`] = `<IconBenchmark />`;
+
+exports[`Tests for Icon renders correctly: blur icon 1`] = `<IconBlur />`;
+
+exports[`Tests for Icon renders correctly: bw icon 1`] = `<IconBW />`;
+
+exports[`Tests for Icon renders correctly: cool icon 1`] = `<IconCool />`;
+
+exports[`Tests for Icon renders correctly: delete icon 1`] = `<IconDelete />`;
+
+exports[`Tests for Icon renders correctly: download icon 1`] = `<IconDownload />`;
+
+exports[`Tests for Icon renders correctly: drag icon 1`] = `<IconDrag />`;
+
+exports[`Tests for Icon renders correctly: image icon 1`] = `<IconImage />`;
+
+exports[`Tests for Icon renders correctly: info icon 1`] = `<IconInfo />`;
+
+exports[`Tests for Icon renders correctly: invert icon 1`] = `<IconInvert />`;
+
+exports[`Tests for Icon renders correctly: js icon 1`] = `<IconJS />`;
+
+exports[`Tests for Icon renders correctly: sharpen icon 1`] = `<IconSharpen />`;
+
+exports[`Tests for Icon renders correctly: toggle icon 1`] = `<IconToggle />`;
+
+exports[`Tests for Icon renders correctly: undo icon 1`] = `<IconUndo />`;
