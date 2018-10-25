@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for ImageView renders correctly (empty view) 1`] = `
+<ImageView
+  image={null}
+>
+  <div>
+    <canvas
+      className="imageview"
+    />
+  </div>
+</ImageView>
+`;
