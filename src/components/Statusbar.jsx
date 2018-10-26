@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from './Icon';
 import { Spinner } from './Spinner';
-import { connect } from '../store/AppStore';
+import { connect } from '../stores/AppStore';
 
 type StatusbarProps = {
   status: string,

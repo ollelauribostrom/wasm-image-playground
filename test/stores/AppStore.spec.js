@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { config } from '../../src/store/AppStore';
+import { config } from '../../src/stores/AppStore';
 import ImageService from '../../src/services/ImageService';
 
 jest.mock('../../src/services/ImageService', () => ({

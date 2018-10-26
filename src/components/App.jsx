@@ -1,5 +1,5 @@
 import React from 'react';
-import { Provider, actions } from '../store/AppStore';
+import { Provider, actions } from '../stores/AppStore';
 import ErrorBoundary from './ErrorBoundary';
 import Header from './Header';
 import { Footer } from './Footer';

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from '../store/AppStore';
+import { connect } from '../stores/AppStore';
 
 class ImageView extends Component {
   canvas: any;

@@ -2,7 +2,7 @@ import React from 'react';
 import { mount } from 'enzyme';
 import ImageView from '../../src/components/ImageView';
 
-jest.mock('../../src/store/AppStore', () => ({
+jest.mock('../../src/stores/AppStore', () => ({
   connect: () => arg => arg
 }));
 

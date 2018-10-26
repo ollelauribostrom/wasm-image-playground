@@ -1,7 +1,7 @@
 import React from 'react';
 import { Icon } from './Icon';
 import { Button } from './Button';
-import { connect, actions } from '../store/AppStore';
+import { connect, actions } from '../stores/AppStore';
 
 type HeaderProps = {
   language: string,
