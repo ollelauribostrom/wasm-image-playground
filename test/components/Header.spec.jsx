@@ -1,9 +1,9 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import Header from '../../src/components/Header';
 import { actions } from '../../src/stores/AppStore';
-import { Button } from '../../src/components/Button';
-import { ToggleHandle } from '../../src/components/ToggleHandle';
+import Header from '../../src/components/Header';
+import Button from '../../src/components/Button';
+import ToggleHandle from '../../src/components/ToggleHandle';
 
 jest.mock('../../src/stores/AppStore', () => ({
   connect: () => arg => arg,

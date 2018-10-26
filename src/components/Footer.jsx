@@ -1,9 +1,9 @@
 import React from 'react';
 import Statusbar from './Statusbar';
-import { Button } from './Button';
-import { Icon } from './Icon';
+import Button from './Button';
+import Icon from './Icon';
 
-export function Footer() {
+function Footer() {
   return (
     <div className="footer">
       <Statusbar />
@@ -25,3 +25,5 @@ export function Footer() {
     </div>
   );
 }
+
+export default Footer;

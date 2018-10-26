@@ -1,8 +1,8 @@
 import React from 'react';
 import { shallow, mount } from 'enzyme';
-import App from '../../src/components/App';
 import { actions } from '../../src/stores/AppStore';
-import { Droppable } from '../../src/components/Droppable';
+import App from '../../src/components/App';
+import Droppable from '../../src/components/Droppable';
 
 jest.mock('../../src/stores/AppStore', () => ({
   connect: () => arg => arg,

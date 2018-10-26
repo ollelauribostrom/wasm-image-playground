@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from './Icon';
-import { ToggleHandle } from './ToggleHandle';
+import Icon from './Icon';
+import ToggleHandle from './ToggleHandle';
 
 type ButtonProps = {
   icon?: Icon,
@@ -15,7 +15,7 @@ type ButtonProps = {
   rel?: string
 };
 
-export function Button({
+function Button({
   icon,
   label,
   title,
@@ -82,3 +82,5 @@ Button.defaultProps = {
   target: null,
   rel: null
 };
+
+export default Button;

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from './Icon';
-import { Button } from './Button';
+import Icon from './Icon';
+import Button from './Button';
 import { connect, actions } from '../stores/AppStore';
 import { Filters, Languages } from '../services/types';
 import type { Language } from '../services/types';

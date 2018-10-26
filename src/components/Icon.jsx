@@ -20,7 +20,7 @@ type IconProps = {|
     | 'github'
 |};
 
-export function Icon({ name }: IconProps) {
+export default function Icon({ name }: IconProps) {
   switch (name) {
     case 'image':
       return <IconImage />;

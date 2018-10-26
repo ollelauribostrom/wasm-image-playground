@@ -1,11 +1,11 @@
 import React from 'react';
-import { Icon } from './Icon';
+import Icon from './Icon';
 
 type ToggleHandleProps = {
   onToggle: () => void
 };
 
-export function ToggleHandle({ onToggle }: ToggleHandleProps) {
+function ToggleHandle({ onToggle }: ToggleHandleProps) {
   return (
     <div
       className="toggle__handle"
@@ -23,3 +23,5 @@ export function ToggleHandle({ onToggle }: ToggleHandleProps) {
     </div>
   );
 }
+
+export default ToggleHandle;

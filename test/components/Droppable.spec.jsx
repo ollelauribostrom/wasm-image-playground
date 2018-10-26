@@ -1,6 +1,6 @@
 import React from 'react';
 import { mount } from 'enzyme';
-import { Droppable } from '../../src/components/Droppable';
+import Droppable from '../../src/components/Droppable';
 
 const wait = duration => new Promise(resolve => setTimeout(resolve, duration));
 

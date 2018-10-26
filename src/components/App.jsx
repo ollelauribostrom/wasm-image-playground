@@ -2,12 +2,12 @@ import React from 'react';
 import { Provider, actions } from '../stores/AppStore';
 import ErrorBoundary from './ErrorBoundary';
 import Header from './Header';
-import { Footer } from './Footer';
+import Footer from './Footer';
 import ImageView from './ImageView';
-import { Droppable } from './Droppable';
+import Droppable from './Droppable';
 import '../styles/main.css';
 
-export default function App() {
+function App() {
   return (
     <Provider>
       <ErrorBoundary>
@@ -28,3 +28,5 @@ export default function App() {
     </Provider>
   );
 }
+
+export default App;

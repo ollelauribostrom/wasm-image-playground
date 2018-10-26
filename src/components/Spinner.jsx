@@ -4,7 +4,7 @@ type SpinnerProps = {
   isLoading: boolean
 };
 
-export function Spinner({ isLoading }: SpinnerProps) {
+function Spinner({ isLoading }: SpinnerProps) {
   return isLoading ? (
     <div className="sk-circle">
       <div className="sk-circle1 sk-child" />
@@ -22,3 +22,5 @@ export function Spinner({ isLoading }: SpinnerProps) {
     </div>
   ) : null;
 }
+
+export default Spinner;

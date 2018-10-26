@@ -11,7 +11,7 @@ type DroppableState = {
   draggingTimeout: number
 };
 
-export class Droppable extends Component<DroppableProps, DroppableState> {
+class Droppable extends Component<DroppableProps, DroppableState> {
   droppableContainer: any;
   state = {
     dragging: false,
@@ -52,3 +52,5 @@ export class Droppable extends Component<DroppableProps, DroppableState> {
     );
   }
 }
+
+export default Droppable;
