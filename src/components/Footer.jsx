@@ -12,7 +12,7 @@ function Footer() {
         target="_blank"
         rel="noopener noreferrer"
         label="Credits"
-        customClassName="footer__button"
+        customClassName="footer__button footer__button--credits"
       />
       <Button
         href="https://github.com/ollelauribostrom/wasm-image-playground"

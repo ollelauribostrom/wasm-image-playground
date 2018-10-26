@@ -24,7 +24,7 @@ class ImageView extends Component {
 
   onResize = () => {
     this.canvas.toBlob(blob => {
-      this.canvas.height = this.wrapper.offsetHeight;
+      this.canvas.height = this.wrapper.offsetHeight - 4;
       this.canvas.width = this.wrapper.offsetWidth;
       if (this.props.image) {
         this.drawImage(blob);

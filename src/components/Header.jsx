@@ -6,11 +6,13 @@ import { Filters, Languages } from '../services/types';
 import type { Language } from '../services/types';
 
 type HeaderProps = {
+  image: Image,
   language: Language,
+  history: Array<Image>,
   isLoading: boolean
 };
 
-function Header({ language, isLoading }: HeaderProps) {
+function Header({ image, language, history, isLoading }: HeaderProps) {
   return (
     <div className="header">
       <div className="header__logo">
@@ -83,7 +85,7 @@ function Header({ language, isLoading }: HeaderProps) {
             actions.setLoading(true);
             actions.undo();
           }}
-          isDisabled={isLoading}
+          isDisabled={isLoading || !history.length}
         />
         <Button
           customClassName="toolbar__button toolbar__button--action"
@@ -93,7 +95,7 @@ function Header({ language, isLoading }: HeaderProps) {
             actions.setLoading(true);
             actions.download();
           }}
-          isDisabled={isLoading}
+          isDisabled={isLoading || !image}
         />
         <Button
           customClassName="toolbar__button toolbar__button--action"
