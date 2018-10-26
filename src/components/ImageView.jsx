@@ -42,6 +42,7 @@ class ImageView extends Component {
   render() {
     return (
       <div
+        style={{ height: '100%' }}
         ref={ref => {
           this.wrapper = ref;
         }}

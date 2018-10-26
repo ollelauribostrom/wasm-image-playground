@@ -9,19 +9,144 @@ body {
 }
 
 body {
-  background-color: #f38ba2;
   font-family: 'Roboto', sans-serif;
   font-weight: 100;
   color: #fff;
 }
 
 #root {
+  display: grid;
+  grid-template-rows: 60px auto 40px;
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  grid-row-start: 1;
+  background-color: #fff;
+  border-bottom: 1px solid #d4d4d4;
+  grid-template-columns: 120px auto;
+  display: grid;
+}
+
+.toggle__handle svg {
+  width: 10px;
+  position: absolute;
+  top: 0;
+  right: -25px;
+}
+
+.header__logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #654ff0;
+}
+
+.header__logo svg {
+  height: 30px;
+}
+
+.header__toolbar {
+  grid-template-columns: repeat(auto-fit, 60px);
+  display: grid;
+}
+
+.header__toolbar button {
+  background-color: transparent;
+  border: 0px;
+  border-right: 1px solid #d4d4d4;
+}
+
+.imageview {
+  background-color: #ffffff;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%23ababab' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+}
+
+.footer {
+  grid-row-start: 3;
+  background-color: #654ff0;
+  font-size: 15px;
+  display: grid;
+  grid-template-columns: auto 150px 150px;
+  align-items: center;
+}
+
+a.button {
+  text-decoration: none;
+  color: #fff;
+}
+
+.footer__button svg {
+  padding-left: 2px;
+  height: 14px;
+}
+
+.footer__button svg path {
+  fill: #fff;
+}
+
+.footer__button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.statusbar {
+  padding-left: 20px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+}
+
+.statusbar svg {
+  height: 15px;
+  margin-right: 10px;
+}
+
+.header__toolbar {
+  grid-template-columns: 60px 60px 60px 60px 60px auto 60px 60px 60px 60px;
+  display: grid;
+}
+
+.toggle__handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 30px 30px 0;
+  border-color: transparent #545454 transparent transparent;
+}
+
+.button.toolbar__button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
+  position: relative;
+}
+
+.toolbar__button--filter {
+  border-right: 1px solid #d4d4d4;
+}
+
+.toolbar__button--filter:last-of-type {
+  border-right: 0px;
+}
+
+.toolbar__button--action {
+  background-color: #f5c3da;
+  border-right: 1px solid #fff;
+}
+
+.toolbar__button--benchmark {
+  background-color: #e0f04f;
+}
+
+.button.toolbar__button svg {
+  height: 20px;
 }
 
 .reactor-container {

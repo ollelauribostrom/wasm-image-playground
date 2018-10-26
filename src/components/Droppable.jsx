@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { height } from 'window-size';
 
 type DroppableProps = {
   onDrop: () => void,
@@ -43,6 +44,7 @@ class Droppable extends Component<DroppableProps, DroppableState> {
   render() {
     return (
       <div
+        style={{ height: '100%' }}
         ref={ref => {
           this.droppableContainer = ref;
         }}
