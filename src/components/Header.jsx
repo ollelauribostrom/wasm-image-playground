@@ -2,9 +2,11 @@ import React from 'react';
 import { Icon } from './Icon';
 import { Button } from './Button';
 import { connect, actions } from '../stores/AppStore';
+import { Filters, Languages } from '../services/types';
+import type { Language } from '../services/types';
 
 type HeaderProps = {
-  language: string,
+  language: Language,
   isLoading: boolean
 };
 
@@ -21,7 +23,7 @@ function Header({ language, isLoading }: HeaderProps) {
           icon={<Icon name="blur" />}
           onClick={async () => {
             actions.setLoading(true);
-            await actions.applyFilter('blur');
+            await actions.applyFilter(Filters.BoxBlur);
           }}
           isDisabled={isLoading}
         />
@@ -31,7 +33,7 @@ function Header({ language, isLoading }: HeaderProps) {
           icon={<Icon name="bw" />}
           onClick={async () => {
             actions.setLoading(true);
-            await actions.applyFilter('grayscale');
+            await actions.applyFilter(Filters.Grayscale);
           }}
           isDisabled={isLoading}
         />
@@ -41,7 +43,7 @@ function Header({ language, isLoading }: HeaderProps) {
           icon={<Icon name="sharpen" />}
           onClick={async () => {
             actions.setLoading(true);
-            await actions.applyFilter('sharpen');
+            await actions.applyFilter(Filters.Sharpen);
           }}
           isDisabled={isLoading}
         />
@@ -51,7 +53,7 @@ function Header({ language, isLoading }: HeaderProps) {
           icon={<Icon name="invert" />}
           onClick={async () => {
             actions.setLoading(true);
-            await actions.applyFilter('invert');
+            await actions.applyFilter(Filters.Invert);
           }}
           isDisabled={isLoading}
         />
@@ -61,7 +63,7 @@ function Header({ language, isLoading }: HeaderProps) {
           icon={<Icon name="cool" />}
           onClick={async () => {
             actions.setLoading(true);
-            await actions.applyFilter('cool');
+            await actions.applyFilter(Filters.Cooling);
           }}
           isDisabled={isLoading}
         />
@@ -77,9 +79,9 @@ function Header({ language, isLoading }: HeaderProps) {
           customClassName="toolbar__button toolbar__button--action"
           title="Undo last action"
           icon={<Icon name="undo" />}
-          onClick={async () => {
+          onClick={() => {
             actions.setLoading(true);
-            await actions.undo();
+            actions.undo();
           }}
           isDisabled={isLoading}
         />
@@ -87,9 +89,9 @@ function Header({ language, isLoading }: HeaderProps) {
           customClassName="toolbar__button toolbar__button--action"
           title="Download"
           icon={<Icon name="download" />}
-          onClick={async () => {
+          onClick={() => {
             actions.setLoading(true);
-            await actions.download();
+            actions.download();
           }}
           isDisabled={isLoading}
         />
@@ -97,9 +99,9 @@ function Header({ language, isLoading }: HeaderProps) {
           customClassName="toolbar__button toolbar__button--action"
           title="Delete"
           icon={<Icon name="delete" />}
-          onClick={async () => {
+          onClick={() => {
             actions.setLoading(true);
-            await actions.delete();
+            actions.delete();
           }}
           isDisabled={isLoading}
         />
@@ -107,7 +109,11 @@ function Header({ language, isLoading }: HeaderProps) {
           customClassName="toolbar__button toolbar__button--action"
           title="Current language mode"
           icon={<Icon name={language} />}
-          onToggle={() => actions.setLanguage(language === 'js' ? 'wasm' : 'js')}
+          onToggle={() =>
+            actions.setLanguage(
+              language === Languages.JavaScript ? Languages.WebAssembly : Languages.JavaScript
+            )
+          }
           isDisabled={isLoading}
         />
       </div>

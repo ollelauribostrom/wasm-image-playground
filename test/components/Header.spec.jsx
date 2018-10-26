@@ -52,7 +52,7 @@ describe('Tests for Header', () => {
       .at(ButtonIndex.Blur)
       .simulate('click');
     expect(actions.setLoading).toHaveBeenCalledWith(true);
-    expect(actions.applyFilter).toHaveBeenCalledWith('blur');
+    expect(actions.applyFilter).toHaveBeenCalledWith('BoxBlur');
   });
   it('handles click on the grayscale button', () => {
     const wrapper = shallow(<Header language="js" />);
@@ -61,7 +61,7 @@ describe('Tests for Header', () => {
       .at(ButtonIndex.Grayscale)
       .simulate('click');
     expect(actions.setLoading).toHaveBeenCalledWith(true);
-    expect(actions.applyFilter).toHaveBeenCalledWith('grayscale');
+    expect(actions.applyFilter).toHaveBeenCalledWith('Grayscale');
   });
   it('handles click on the sharpen button', () => {
     const wrapper = shallow(<Header language="js" />);
@@ -70,7 +70,7 @@ describe('Tests for Header', () => {
       .at(ButtonIndex.Sharpen)
       .simulate('click');
     expect(actions.setLoading).toHaveBeenCalledWith(true);
-    expect(actions.applyFilter).toHaveBeenCalledWith('sharpen');
+    expect(actions.applyFilter).toHaveBeenCalledWith('Sharpen');
   });
   it('handles click on the invert button', () => {
     const wrapper = shallow(<Header language="js" />);
@@ -79,7 +79,7 @@ describe('Tests for Header', () => {
       .at(ButtonIndex.Invert)
       .simulate('click');
     expect(actions.setLoading).toHaveBeenCalledWith(true);
-    expect(actions.applyFilter).toHaveBeenCalledWith('invert');
+    expect(actions.applyFilter).toHaveBeenCalledWith('Invert');
   });
   it('handles click on the cool button', () => {
     const wrapper = shallow(<Header language="js" />);
@@ -88,7 +88,7 @@ describe('Tests for Header', () => {
       .at(ButtonIndex.Cool)
       .simulate('click');
     expect(actions.setLoading).toHaveBeenCalledWith(true);
-    expect(actions.applyFilter).toHaveBeenCalledWith('cool');
+    expect(actions.applyFilter).toHaveBeenCalledWith('Cooling');
   });
   it('handles click on the benchmark button', () => {
     const wrapper = shallow(<Header language="js" />);
