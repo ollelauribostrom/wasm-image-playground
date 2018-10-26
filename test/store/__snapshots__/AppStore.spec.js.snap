@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Tests for AppStore has the correct initial state 1`] = `
+Object {
+  "history": Array [],
+  "image": null,
+  "isDragging": false,
+  "isLoading": false,
+  "language": "js",
+  "showBenchmarkModal": false,
+  "status": null,
+}
+`;
